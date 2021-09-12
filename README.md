@@ -1,6 +1,6 @@
 # Blockchain developer bootcamp final project
 
-## Decentralized User Authentication
+## Idea 1: Decentralized User Authentication
 
 ### We have two roles:
 
@@ -20,3 +20,10 @@
 
 - Web3 UI where the Business Owner will interact with the smart contract and register his whitelisted public addresses.
 - The Business Owner's website that will have a web3 snippet that will allow it's users to sign in by interacting with the smart contract.
+
+## Idea 2: Wallet that stores ERC20 tokens and invests them on compound.finance
+
+### Description
+
+- The user will be able to view, deposit and withdraw funds (ether and ERC20 tokens)
+- The user will be able, through a UI toggle, to invest the selected funds through compound.finance
