@@ -26,4 +26,5 @@ truffle console
 let instance = await MetaCoin.deployed()
 let accounts = await web3.eth.getAccounts()
 let balance = await instance.getBalance(accounts[0])
+balance.toNumber()
 ```
