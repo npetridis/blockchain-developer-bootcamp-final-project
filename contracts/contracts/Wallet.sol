@@ -24,8 +24,8 @@ contract Wallet {
     // address[] tokens;
     // mapping(address => bool) tokens;
 
-    mapping(address => uint256) userEtherBalance; // user address => ether amount
-    mapping(address => mapping(address => uint256)) userTokenBalance; // user address => token address => amount
+    mapping(address => uint256) private userEtherBalance; // user address => ether amount
+    mapping(address => mapping(address => uint256)) private userTokenBalance; // user address => token address => amount
 
     modifier onlyOwner() {
         require(owner == msg.sender, "Not owner");
