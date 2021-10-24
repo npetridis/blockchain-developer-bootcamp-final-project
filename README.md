@@ -27,3 +27,28 @@
 
 - The user will be able to view, deposit and withdraw funds (ether and ERC20 tokens)
 - The user will be able, through a UI toggle, to invest the selected funds through compound.finance
+
+### TODO
+
+- Make contract Pausable to be prepared for bugs, Circui breaker design pattern
+- Manage the amount of money at risk with `rate limiting` or `caps` and setup an effective upgrade path for bug fixes and improvements
+- Do not to use send and transfer, and instead use call.value
+- Use withdrawal pattern and push-pull
+- To avoid front-running use commit - reveal pattern
+- Reentrancy (change the balance and then send the money) check 3 word rule on relative section
+- Reentrancy vs push pull withdrawal pattern
+
+Checks-Effects-Interactions
+Avoid state changes after external calls, to avoid things like the DAO hack:
+
+function withdraw(uint amount) public { // Possibly dangerous
+require(balances[msg.sender] >= amount);
+msg.sender.call.value(amount)("");
+balances[msg.sender] -= amount;
+}
+
+function withdraw(uint amount) public { // Better!
+require(balances[msg.sender] >= amount);
+balances[msg.sender] -= amount;
+msg.sender.call.value(amount)("");
+}
