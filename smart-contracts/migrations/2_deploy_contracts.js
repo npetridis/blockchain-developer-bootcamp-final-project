@@ -1,11 +1,11 @@
 // const ConvertLib = artifacts.require("ConvertLib");
 // const MetaCoin = artifacts.require("MetaCoin");
-const Petridereum = artifacts.require("Petridereum");
-const Wallet = artifacts.require("Wallet");
+const Petrideum = artifacts.require("Petrideum");
+const DefiVault = artifacts.require("DefiVault");
 
 module.exports = function (deployer) {
   // deployer.deploy(ConvertLib);
   // deployer.link(ConvertLib, MetaCoin);
-  deployer.deploy(Petridereum);
-  deployer.deploy(Wallet);
+  deployer.deploy(Petrideum);
+  deployer.deploy(DefiVault);
 };

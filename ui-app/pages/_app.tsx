@@ -10,7 +10,7 @@ function MyApp({ Component, pageProps }: AppProps): React.ReactNode {
   return (
     <>
       <Head>
-        <title>Petra Wallet</title>
+        <title>DefiVault</title>
       </Head>
       <ChakraProvider resetCSS>
         <Web3Provider>

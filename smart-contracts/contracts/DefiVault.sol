@@ -11,7 +11,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol";
 /// @author Nikolaos Petridis
 /// @notice You can use this contract for only the most basic simulation
 /// @dev All function calls are currently implemented without side effects
-contract Wallet {
+contract DefiVault {
   using SafeERC20 for IERC20;
 
   mapping(address => uint256) private etherBalances; // user address => ether amount

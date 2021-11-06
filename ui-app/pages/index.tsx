@@ -12,7 +12,7 @@ const Home: NextPage = () => {
   const { connectSigner, getSigner } = useSigner();
   const { blockNumber } = useBlockNumber();
   const { name, symbol, totalSupply, getAddressBalance, transfer } =
-    useErc20Token(process.env.NEXT_PUBLIC_PETRIDEREUM_ERC20_ADDRESS as string);
+    useErc20Token(process.env.NEXT_PUBLIC_PETRIDEUM_ERC20_ADDRESS as string);
   const [maxBalance, setMaxBalance] = React.useState('0');
   const { register, getValues } = useForm();
 
