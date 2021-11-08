@@ -3,7 +3,6 @@ import { useWeb3Provider } from 'contexts/web3';
 
 export const useSigner = () => {
   const provider = useWeb3Provider();
-  const [signer, setSigner] = React.useState();
   // const [isConnecting, setIsConnecting] = React.useState<boolean>();
 
   // React.useEffect(() => {
@@ -28,6 +27,7 @@ export const useSigner = () => {
     if (!provider) {
       return false;
     }
+
     return provider.getSigner();
   }, [provider]);
 

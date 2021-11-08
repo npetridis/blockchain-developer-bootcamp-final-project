@@ -1,12 +1,13 @@
 import React from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, BoxProps } from '@chakra-ui/react';
 
-interface CardContainerProps {
+type CardContainerProps = {
   children: React.ReactNode;
   disabled?: boolean;
   opaque?: boolean;
   nonClickable?: boolean;
-}
+  light?: boolean;
+} & BoxProps;
 
 const MAKE_OPAQUE_STYLE: React.CSSProperties = {
   opacity: '0.5',
@@ -21,6 +22,8 @@ export function Card({
   nonClickable,
   opaque,
   children,
+  light,
+  ...rest
 }: CardContainerProps): JSX.Element {
   const getStyles = (): React.CSSProperties => {
     return {
@@ -28,16 +31,17 @@ export function Card({
       ...(disabled || opaque ? MAKE_OPAQUE_STYLE : {}),
     };
   };
+
   return (
     <Box
       border="1px solid"
-      // borderColor={cssVars.border}
-      bg="gray.500"
+      bg={light ? 'background.active' : 'background.dark'}
       flex="1"
       py="2rem"
       px={6}
       rounded="2xl"
       style={getStyles()}
+      {...rest}
     >
       {children}
     </Box>

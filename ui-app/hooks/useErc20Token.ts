@@ -1,8 +1,12 @@
 import React from 'react';
 import { BigNumber, ethers } from 'ethers';
-import erc20AbiJson from 'abi/erc20.abi.json';
+// import erc20AbiJson from 'abi/erc20.abi.json';
+import erc20AbiJson from '../../smart-contracts/build/contracts/ERC20.json';
 import { useWeb3Provider } from 'contexts/web3';
 import { noop } from 'utils';
+
+console.log('ierc20AbiJson', erc20AbiJson);
+
 
 type TokenData = {
   name: string;
@@ -32,11 +36,10 @@ export const useErc20Token = (tokenAddress: string): UseErc20Token => {
       return;
     }
 
-
     const signer = provider.getSigner();
     const erc20Contract = new ethers.Contract(
       tokenAddress,
-      erc20AbiJson,
+      erc20AbiJson.abi,
       signer//provider
     );
     setContract(erc20Contract);

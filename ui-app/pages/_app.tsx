@@ -6,13 +6,17 @@ import { Layout } from 'components/Layout';
 import Head from 'next/head';
 import { Web3Provider } from 'contexts/web3';
 
+import { theme } from '../theme';
+
+console.log('theme', theme);
+
 function MyApp({ Component, pageProps }: AppProps): React.ReactNode {
   return (
     <>
       <Head>
         <title>DefiVault</title>
       </Head>
-      <ChakraProvider resetCSS>
+      <ChakraProvider resetCSS theme={theme}>
         <Web3Provider>
           <Layout>
             <Component {...pageProps} />

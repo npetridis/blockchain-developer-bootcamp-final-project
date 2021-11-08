@@ -2,6 +2,8 @@ import React from 'react';
 import { useWeb3Provider } from 'contexts/web3';
 import { BigNumber, ethers } from 'ethers';
 
+// TODO: na ginei me context to state gia na einai to idio pantou
+
 export const useWallet = () => {
   const provider = useWeb3Provider();
   const [isConnecting, setIsConnecting] = React.useState<boolean>();
@@ -32,6 +34,8 @@ export const useWallet = () => {
       setAccounts(newAccounts);
       updateSigner();
     });
+
+    // TODO: switch with provider.on and add cleanup
   }, [provider]);
 
   const updateSigner = async () => {

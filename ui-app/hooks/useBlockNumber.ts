@@ -14,8 +14,17 @@ export const useBlockNumber = () => {
       const data = await provider.getBlockNumber();
       setBlockNumber(data);
     };
-
     getBlockNumber();
+
+    const blockListener = (blockNumber: number) => {
+      // Emitted on every block change
+      setBlockNumber(blockNumber)
+    }
+
+    provider.on("block", blockListener);
+
+    return () => void provider.removeListener('block', blockListener);
+
   }, [provider]);
 
   return {
