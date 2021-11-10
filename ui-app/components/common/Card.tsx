@@ -40,6 +40,7 @@ export function Card({
       py="2rem"
       px={6}
       rounded="2xl"
+      maxH="85vh"
       style={getStyles()}
       {...rest}
     >

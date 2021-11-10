@@ -1,12 +1,8 @@
 import React from 'react';
-import { BigNumber, ethers } from 'ethers';
-// import erc20AbiJson from 'abi/erc20.abi.json';
+import { BigNumber, ethers, Signer } from 'ethers';
 import erc20AbiJson from '../../smart-contracts/build/contracts/ERC20.json';
 import { useWeb3Provider } from 'contexts/web3';
-import { noop } from 'utils';
-
-console.log('ierc20AbiJson', erc20AbiJson);
-
+import { useSigner } from './useSigner';
 
 type TokenData = {
   name: string;
@@ -22,12 +18,20 @@ const INITIAL_DATA: TokenData = {
 
 type UseErc20Token = TokenData & {
   contract: ethers.Contract | null;
-  getAddressBalance: (address: string) => Promise<BigNumber | null>;
-  transfer: (recipient: string, amount: string) => Promise<boolean>;
+  transfer: (recipient: string, amount: BigNumber) => Promise<any>;
+  getTotalSupply: () => Promise<BigNumber | null>;
+  getBalanceOf: (address: string) => Promise<BigNumber | null>;
+  getAllowance: (spenderAddress: string, ownerAddress: string) => Promise<BigNumber | null>;
+  approve: (spenderAddress: string, amount: BigNumber) => Promise<any>;
+  transferFrom: (sender: string, recipient: string, amount: BigNumber) => Promise<any>;
 };
 
-export const useErc20Token = (tokenAddress: string): UseErc20Token => {
+export const useErc20Token = (
+  contractAddress: string,
+  signerPrivateKey?: string
+): UseErc20Token => {
   const provider = useWeb3Provider();
+  const { getSigner } = useSigner();
   const [contract, setContract] = React.useState<ethers.Contract | null>(null);
   const [tokenData, setTokenData] = React.useState<TokenData>(INITIAL_DATA);
 
@@ -36,11 +40,10 @@ export const useErc20Token = (tokenAddress: string): UseErc20Token => {
       return;
     }
 
-    const signer = provider.getSigner();
     const erc20Contract = new ethers.Contract(
-      tokenAddress,
+      contractAddress,
       erc20AbiJson.abi,
-      signer//provider
+      provider
     );
     setContract(erc20Contract);
 
@@ -52,31 +55,170 @@ export const useErc20Token = (tokenAddress: string): UseErc20Token => {
       setTokenData({ name, symbol, totalSupply: totalSupply });
     };
     getTokenData();
-  }, [provider]);
+  }, [provider]
+  );
 
-  const getAddressBalance = React.useCallback(
-    async (address: string): Promise<BigNumber> => {
-      if (!contract) return BigNumber.from(0);
-      const addressBalance = await contract.balanceOf(address);
-      // return ethers.utils.formatUnits(addressBalance, 18);
-      return addressBalance;
-    },
-    [contract]
+  const getTotalSupply = React.useCallback(
+    async (): Promise<BigNumber | null> => {
+      if (!provider) {
+        return null;
+      }
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        erc20AbiJson.abi,
+        provider
+      );
+
+      if (!contract) return null;
+      const result = await contract.totalSupply();
+      return result;
+    }, [provider]
+  );
+
+  const getBalanceOf = React.useCallback(
+    async (accountAddress: string): Promise<BigNumber | null> => {
+      if (!provider) {
+        return null;
+      }
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        erc20AbiJson.abi,
+        provider
+      );
+
+      if (!contract) return null;
+      const result = await contract.balanceOf(accountAddress);
+
+      console.log('result', typeof result, result);
+      return result;
+    }, [provider]);
+
+  const getAllowance = React.useCallback(
+    async (ownerAddress: string, spenderAddress: string): Promise<BigNumber | null> => {
+      if (!provider) {
+        return null;
+      }
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        erc20AbiJson.abi,
+        provider
+      );
+
+      if (!contract) return null;
+      const result = await contract.allowance(ownerAddress, spenderAddress);
+
+      console.log('result', typeof result, result);
+      return result;
+    }, [provider]
   );
 
   const transfer = React.useCallback(
-    async (recipient: string, amount: string) => {
+    async (recipientAddress: string, amount: BigNumber) => {
+      if (!provider) {
+        return null;
+      }
+
+      let signer;
+      if (signerPrivateKey) {
+        signer = new ethers.Wallet(signerPrivateKey, provider);
+      } else {
+        signer = await getSigner();
+      }
+
+      if (!signer) {
+        return null;
+      }
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        erc20AbiJson.abi,
+        signer
+      );
+
       if (!contract) return null;
-      const success = await contract.transfer(recipient, amount);
-      return success;
-    },
-    [contract]
+      const tx = await contract.transfer(recipientAddress, amount.toString());
+      const result = await tx.wait();
+
+      console.log('data', recipientAddress, amount.toString());
+      console.log('result', typeof result, result);
+      return result;
+    }, [provider, signerPrivateKey]
+  );
+
+  const approve = React.useCallback(
+    async (spenderAddress: string, amount: BigNumber) => {
+      if (!provider) {
+        return null;
+      }
+
+      let signer;
+      if (signerPrivateKey) {
+        signer = new ethers.Wallet(signerPrivateKey, provider);
+      } else {
+        signer = await getSigner();
+      }
+
+      if (!signer) {
+        return null;
+      }
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        erc20AbiJson.abi,
+        signer
+      );
+
+      if (!contract) return null;
+      const tx = await contract.approve(spenderAddress, amount.toString());
+      const result = await tx.wait();
+
+      console.log('result', typeof result, result);
+      return result;
+    }, [provider, signerPrivateKey]
+  );
+
+  const transferFrom = React.useCallback(
+    async (senderAddress: string, recipientAddress: string, amount: BigNumber) => {
+      if (!provider) {
+        return null;
+      }
+
+      let signer;
+      if (signerPrivateKey) {
+        signer = new ethers.Wallet(signerPrivateKey, provider);
+      } else {
+        signer = await getSigner();
+      }
+      if (!signer) {
+        return null;
+      }
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        erc20AbiJson.abi,
+        signer
+      );
+
+      if (!contract) return null;
+      const tx = await contract.transferFrom(senderAddress, recipientAddress, amount.toString());
+      const result = await tx.wait();
+
+      console.log('result', typeof result, result);
+      return result;
+    }, [provider, signerPrivateKey]
   );
 
   return {
     ...tokenData,
     contract,
-    getAddressBalance,
-    transfer
+    transfer,
+    getTotalSupply,
+    getBalanceOf,
+    getAllowance,
+    approve,
+    transferFrom
   };
 };

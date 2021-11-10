@@ -25,7 +25,7 @@ export const useSigner = () => {
 
   const getSigner = React.useCallback(() => {
     if (!provider) {
-      return false;
+      return undefined;
     }
 
     return provider.getSigner();
