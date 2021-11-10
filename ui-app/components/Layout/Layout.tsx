@@ -1,8 +1,9 @@
 import React from 'react';
-import { Flex, Button, Box, HStack, Tag, Grid } from '@chakra-ui/react';
+import { Flex, Button, Box, HStack, Tag, Grid, Icon } from '@chakra-ui/react';
 import { useWallet } from 'hooks';
 import { Menu } from './Menu';
 import { WalletInfo } from './WalletInfo';
+import DefiVault from '../../public/defivault.svg';
 
 type Props = {
   children?: React.ReactNode;
@@ -14,8 +15,6 @@ export function Layout({ children }: Props) {
     <Box h="100vh" w="100vw" bg="background.light">
       <Flex
         flexDirection="column"
-        // alignItems="center"
-        // justifyContent="center"
         h="100vh"
         w="100vw"
         bg="#212429"
@@ -33,13 +32,7 @@ export function Layout({ children }: Props) {
           mb="8"
           // zIndex="2"
         >
-          <Box
-            justifySelf="start"
-            h="2em"
-            w="2em"
-            borderRadius="full"
-            bg="gray.50"
-          />
+          <Icon w='141px' h='40px' as={DefiVault} />
           <Menu />
           {isConnected ? (
             <WalletInfo balance={ethBalance} address={signerAddress} />
