@@ -55,9 +55,10 @@ contract DefiVault is EtherWallet {
   /// @return tokens The requested token balance of the sender
   /// @return balances The requested token balance of the sender
   function getTokens() public view returns (address[] memory tokens, uint256[] memory balances) {
-    uint256[] memory _balances = new uint256[](tokens.length);
-    for (uint i = 0; i < tokens.length; i++) {
-      address tokenAddress = tokens[i];
+    address[] memory userTokens = tokenBalances[msg.sender].tokens;
+    uint256[] memory _balances = new uint256[](userTokens.length);
+    for (uint i = 0; i < userTokens.length; i++) {
+      address tokenAddress = userTokens[i];
       _balances[i] = tokenBalances[msg.sender].balances[tokenAddress];
     }
 
