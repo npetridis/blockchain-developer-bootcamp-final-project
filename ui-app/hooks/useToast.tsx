@@ -6,7 +6,7 @@ type SuccessToastProps = {
   description?: string | React.ReactNode;
 };
 
-type SuccessTransactionProps = {
+type SuccessTransactionToastProps = {
   title: string | React.ReactNode;
   txData?: {
     confirmations?: number;
@@ -37,17 +37,23 @@ export const useToast = () => {
     [toast]
   );
 
-  const successTransaction = ({ title, txData }: SuccessTransactionProps) => {
+  const successTransactionToast = ({
+    title,
+    txData,
+  }: SuccessTransactionToastProps) => {
+    const confirmationsLiteral = txData
+      ? `(confirmations: ${txData?.confirmations || 1})`
+      : '';
     successToast({
-      title: `${title} (confirmations: ${txData?.confirmations || 1})`,
-      description: (
+      title: `${title} ${confirmationsLiteral}`,
+      description: txData ? (
         <>
           <div>Block number: {txData?.blockNumber}</div>
           <div>
             Tx hash: <div>{txData?.transactionHash}</div>
           </div>
         </>
-      ),
+      ) : null,
     });
   };
 
@@ -71,6 +77,6 @@ export const useToast = () => {
   return {
     successToast,
     errorToast,
-    successTransaction,
+    successTransactionToast,
   };
 };

@@ -10,7 +10,7 @@ type DepositTokenSectionProps = {
   isLoading?: boolean;
 };
 
-type DepositTokenFormProps = {
+export type DepositTokenFormProps = {
   contractAddress: string;
   amount: string;
 };

@@ -10,14 +10,20 @@ import {
   useClipboard,
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
-import { Button, Card } from 'components/common';
+import { Card } from 'components/common';
 import { useSigner, useToast } from 'hooks';
 import { useWeb3Provider } from 'contexts/web3';
 import { formatAddress } from 'utils';
 import { CopyIcon } from '@chakra-ui/icons';
+import { AddressCopy } from './AddressCopy';
 
+// A private key shouldn't get exposed
+// Τhis is only for test reasons to demonstate the smart contract functionality
 const ptrdOwnerPrivateKey = process.env
   .NEXT_PUBLIC_PETRIDEUM_OWNER_PRIVATE_KEY as string;
+
+const defiVaultContractAddress = process.env
+  .NEXT_PUBLIC_DEFI_VAULT_CONTRACT_ADDRESS as string;
 
 type SignerSelectorProps = {
   onSignerChange: (pk: string | undefined) => void;
@@ -31,9 +37,9 @@ export function SignerSelector({
   const [ptrdDeployerAddress, setPtrdDeployerAddress] =
     React.useState<string>('');
   const [metamaskAddress, setMetamaskAddress] = React.useState<string>('');
-  const { successToast, errorToast } = useToast();
   const { onCopy: onCopyPtrd } = useClipboard(ptrdDeployerAddress);
   const { onCopy: onCopyMtmk } = useClipboard(metamaskAddress);
+  const { onCopy: onCopyDefiVaultAdr } = useClipboard(defiVaultContractAddress);
 
   const updateMetamaskAddress = async function () {
     const metamaskSigner = await getSigner();
@@ -92,32 +98,23 @@ export function SignerSelector({
             {formatAddress(metamaskAddress, 14)} (Metamask account)
           </option>
         </Select>
-        <Box>
-          <HStack mb="0.25em">
-            <Text w="205px">PTRD manager address:</Text>
-            <Code cursor="pointer" onClick={onCopyPtrd}>
-              {formatAddress(ptrdDeployerAddress, 8)}
-            </Code>
-            <CopyIcon
-              color="white"
-              cursor="pointer"
-              onClick={onCopyPtrd}
-              _hover={{ color: 'blue.200' }}
-            />
-          </HStack>
-          <HStack>
-            <Text w="205px">Metamask account address:</Text>
-            <Code cursor="pointer" onClick={onCopyMtmk}>
-              {formatAddress(metamaskAddress, 8)}
-            </Code>
-            <CopyIcon
-              color="white"
-              cursor="pointer"
-              onClick={onCopyMtmk}
-              _hover={{ color: 'blue.200' }}
-            />
-          </HStack>
-        </Box>
+        <Stack spacing="0.25em">
+          <AddressCopy
+            label="PTRD manager address"
+            address={ptrdDeployerAddress}
+            onCopyClick={onCopyPtrd}
+          />
+          <AddressCopy
+            label="Metamask account address"
+            address={metamaskAddress}
+            onCopyClick={onCopyMtmk}
+          />
+          <AddressCopy
+            label="DefiVault contract address"
+            address={defiVaultContractAddress}
+            onCopyClick={onCopyDefiVaultAdr}
+          />
+        </Stack>
       </Stack>
     </Card>
   );
