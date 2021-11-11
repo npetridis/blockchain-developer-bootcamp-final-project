@@ -10,7 +10,7 @@ type WithdrawTokenSectionProps = {
   isLoading?: boolean;
 };
 
-type WithdrawTokenFormProps = {
+export type WithdrawTokenFormProps = {
   contractAddress: string;
   amount: string;
 };

@@ -1,24 +1,21 @@
 import React from 'react';
-import { useToast, useWallet } from 'hooks';
-import { Button, Card } from 'components/common';
-import { Heading, Stack, Text } from '@chakra-ui/react';
-import { BigNumber, utils } from 'ethers';
+import { useToast } from 'hooks';
+import { Card } from 'components/common';
+import { Flex, Heading, Stack, Text } from '@chakra-ui/react';
+import { BigNumber } from 'ethers';
 import {
   DepositTokenSection,
   DepositTokenFormProps,
 } from './DepositTokenSection';
-import { WithdrawTokenSection } from './WithdrawTokenSection';
+import {
+  WithdrawTokenSection,
+  WithdrawTokenFormProps
+} from './WithdrawTokenSection';
 import { useDefiVaultContract } from 'hooks/useDefiVaultContract';
 import { formatAddress } from 'utils';
 
-type TokenInteraction = {
-  tokenAddress: string;
-  amount: string;
-};
-
 export function Erc20Wallet(): JSX.Element {
-  const { ethBalance: walletEtherBalance } = useWallet();
-  const { tokenBalances, depositToken, withdrawToken, getTokens } =
+  const { tokenBalances, depositToken, withdrawToken } =
     useDefiVaultContract(
       process.env.NEXT_PUBLIC_DEFI_VAULT_CONTRACT_ADDRESS as string
     );
@@ -28,13 +25,6 @@ export function Erc20Wallet(): JSX.Element {
     contractAddress,
     amount,
   }: DepositTokenFormProps) => {
-    console.log(
-      'Depositing Token',
-      amount,
-      BigNumber.from(amount).toString(),
-      contractAddress
-    );
-
     try {
       const txData = await depositToken(
         contractAddress,
@@ -47,37 +37,19 @@ export function Erc20Wallet(): JSX.Element {
   };
 
   const handleWithdrawEther = async ({
-    tokenAddress,
+    contractAddress,
     amount,
-  }: TokenInteraction) => {
-    console.log(
-      'Withdrawing Token',
-      amount,
-      BigNumber.from(amount),
-      tokenAddress
-    );
-
+  }: WithdrawTokenFormProps) => {
     try {
-      const newBalance = await withdrawToken(
-        tokenAddress,
+      const txData = await withdrawToken(
+        contractAddress,
         BigNumber.from(amount)
       );
-      console.log('withdraw token balance', newBalance);
+      successTransactionToast({ title: 'Withdrawal was successful!', txData });
     } catch (error) {
       errorToast({ error });
     }
   };
-
-  const handleGetTokens = async () => {
-    try {
-      const txData = await getTokens();
-      successTransactionToast({ title: 'Operation was successful!' });
-    } catch (error) {
-      errorToast({ error });
-    }
-  };
-
-  console.log('tokensBalance', tokenBalances);
 
   return (
     <Card maxWidth="500px">
@@ -85,12 +57,18 @@ export function Erc20Wallet(): JSX.Element {
         ERC20 Wallet
       </Heading>
       <Stack spacing="1em">
-        <Button onClick={handleGetTokens}>Get tokens</Button>
-        {tokenBalances?.map(({ address, balance }) => (
-          <Text key={address}>
-            {formatAddress(address)}: {balance.toString()}
-          </Text>
-        ))}
+        <Card light py='1em'>
+          {tokenBalances?.map(({ address, balance, name, symbol }) => (
+            <Flex key={address} justify='space-between'>
+              <Text>
+                {`${name} (${symbol}): ${balance.toString()}`}
+              </Text>
+              <Text>
+                {`${formatAddress(address, 10)}`}
+              </Text>
+            </Flex>
+          ))}
+        </Card>
         <DepositTokenSection onDepositToken={handleDepositToken} />
         <WithdrawTokenSection onWithdrawToken={handleWithdrawEther} />
       </Stack>

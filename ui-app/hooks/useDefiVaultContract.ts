@@ -3,17 +3,18 @@ import { BigNumber, ethers } from 'ethers';
 import defiVaultAbiJson from '../../smart-contracts/build/contracts/DefiVault.json';
 import { useWeb3Provider } from 'contexts/web3';
 import { useSigner } from './useSigner';
-
-console.log('defiVaultAbiJson', defiVaultAbiJson);
+import { useErc20Info } from './useErc20Info';
 
 enum Events {
   DepositErc20 = 'DepositERC20',
-  WithdrawErc20 = 'WithdrawErc20',
+  WithdrawErc20 = 'WithdrawERC20',
 };
 
 type TokenBalance = {
   address: string;
   balance: BigNumber;
+  name: string;
+  symbol: string;
 };
 
 type GetTokensResponse = {
@@ -24,7 +25,7 @@ type GetTokensResponse = {
 
 type UseDefiVaultContract = {
   depositToken: (tokenAddress: string, etherAmount: BigNumber) => Promise<any>;
-  withdrawToken: (tokenAddress: string, etherAmount: BigNumber) => Promise<BigNumber | null>;
+  withdrawToken: (tokenAddress: string, etherAmount: BigNumber) => Promise<any>;
   getTokens: () => Promise<GetTokensResponse>;
   tokenBalances: TokenBalance[] | undefined;
 };
@@ -33,16 +34,18 @@ export const useDefiVaultContract = (contractAddress: string): UseDefiVaultContr
   const provider = useWeb3Provider();
   const { getSigner } = useSigner();
   const [tokenBalances, setTokenBalances] = React.useState<TokenBalance[]>();
-  // const [contract, setContract] = React.useState<ethers.Contract | null>(null);
+  const { getErc20Info } = useErc20Info();
 
   const updateAllTokensBalance = React.useCallback(
     async () => {
       const result = await getTokens();
       if (!result) return;
-      const mergedResult: TokenBalance[] = result.tokens.map((address, index) => ({
+      const mergedResult: TokenBalance[] = await Promise.all(result.tokens.map(async (address, index) => ({
         address,
-        balance: result.balances[index]
-      }));
+        balance: result.balances[index],
+        ...(await getErc20Info(address) || {})
+      })));
+
       setTokenBalances(mergedResult);
     },
     [provider]
@@ -52,22 +55,30 @@ export const useDefiVaultContract = (contractAddress: string): UseDefiVaultContr
     updateAllTokensBalance();
   }, [provider]);
 
-  const updateTokenBalance = React.useCallback((addressToUpdate: string, newBalance: BigNumber) => {
+  const updateTokenBalance = React.useCallback(async (addressToUpdate: string, newBalance: BigNumber) => {
     if (!tokenBalances) {
-      setTokenBalances([{ address: addressToUpdate, balance: newBalance }]);
+      const newTokenBalances = await Promise.resolve([{
+        address: addressToUpdate,
+        balance: newBalance,
+        ...(await getErc20Info(addressToUpdate))
+      }]);
+      setTokenBalances(newTokenBalances);
       return;
     }
 
-    console.log('CCCC', addressToUpdate, newBalance.toString(), tokenBalances)
     const tokenIndex = tokenBalances.findIndex(({ address }) => address === addressToUpdate);
-    // if (tokenIndex === -1) return;
+
     const newTokenBalances = [...tokenBalances];
-    newTokenBalances[tokenIndex] = { address: addressToUpdate, balance: newBalance };
+    newTokenBalances[tokenIndex] = {
+      ...newTokenBalances[tokenIndex],
+      balance: newBalance
+    };
+
     setTokenBalances(newTokenBalances);
   }, [tokenBalances, setTokenBalances])
 
   const withdrawToken = React.useCallback(
-    async (tokenAddress: string, amount: BigNumber): Promise<BigNumber | null> => {
+    async (tokenAddress: string, amount: BigNumber): Promise<any> => {
       if (!provider) {
         return null;
       }
@@ -86,13 +97,13 @@ export const useDefiVaultContract = (contractAddress: string): UseDefiVaultContr
 
       if (!contract) return null;
       const tx = await contract.withdrawToken(tokenAddress, amount.toString());
-      const result = await tx.wait();
+      const txData = await tx.wait();
 
-      const withdrawErc20Event = result.events[0];
-      const newBalance = withdrawErc20Event.args[3] as BigNumber;
+      const withdrawErc20event = txData.events.find(e => e?.event === Events.WithdrawErc20);
+      const newBalance = withdrawErc20event.args[3] as BigNumber;
 
-      // setTokenBalances(newBalance);
-      return newBalance;
+      updateTokenBalance(tokenAddress, newBalance);
+      return txData;
     },
     [provider]
   );
@@ -117,20 +128,13 @@ export const useDefiVaultContract = (contractAddress: string): UseDefiVaultContr
 
       if (!contract) return null;
       const tx = await contract.depositToken(tokenAddress, amount.toString());
-      console.log('AAAA tx', tx)
       const txData = await tx.wait();
 
       const depositErc20event = txData.events.find(e => e?.event === Events.DepositErc20);
       const newBalance = depositErc20event.args[3] as BigNumber;
-      // use tokenAddress and newBalance to update local state
-      console.log('BBBB tx', txData)
-      updateTokenBalance(tokenAddress, newBalance);
-      // the update will happen with an event listener
-      // return tx success data and update with the new balance the local state
 
-      // update the current token address balance
-      // setTokenBalances(newBalance);
-      // return newBalance;
+      updateTokenBalance(tokenAddress, newBalance);
+
       return txData;
     },
     [provider, updateTokenBalance]
@@ -150,7 +154,6 @@ export const useDefiVaultContract = (contractAddress: string): UseDefiVaultContr
       if (!contract) return null;
 
       const result = await contract.getTokens();
-      console.log('AAAA', result);
       return result;
     },
     [provider]
