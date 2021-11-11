@@ -2,20 +2,13 @@ import React from 'react';
 import {
   Heading,
   Select,
-  Text,
-  Code,
-  HStack,
   Stack,
-  Box,
-  useClipboard,
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
-import { Card } from 'components/common';
-import { useSigner, useToast } from 'hooks';
+import { Card, AddressCopy } from 'components/common';
+import { useSigner } from 'hooks';
 import { useWeb3Provider } from 'contexts/web3';
 import { formatAddress } from 'utils';
-import { CopyIcon } from '@chakra-ui/icons';
-import { AddressCopy } from './AddressCopy';
 
 // A private key shouldn't get exposed
 // Τhis is only for test reasons to demonstate the smart contract functionality
@@ -37,9 +30,6 @@ export function SignerSelector({
   const [ptrdDeployerAddress, setPtrdDeployerAddress] =
     React.useState<string>('');
   const [metamaskAddress, setMetamaskAddress] = React.useState<string>('');
-  const { onCopy: onCopyPtrd } = useClipboard(ptrdDeployerAddress);
-  const { onCopy: onCopyMtmk } = useClipboard(metamaskAddress);
-  const { onCopy: onCopyDefiVaultAdr } = useClipboard(defiVaultContractAddress);
 
   const updateMetamaskAddress = async function () {
     const metamaskSigner = await getSigner();
@@ -100,19 +90,16 @@ export function SignerSelector({
         </Select>
         <Stack spacing="0.25em">
           <AddressCopy
-            label="PTRD manager address"
+            label="PTRD manager address:"
             address={ptrdDeployerAddress}
-            onCopyClick={onCopyPtrd}
           />
           <AddressCopy
-            label="Metamask account address"
+            label="Metamask account address:"
             address={metamaskAddress}
-            onCopyClick={onCopyMtmk}
           />
           <AddressCopy
-            label="DefiVault contract address"
+            label="DefiVault contract address:"
             address={defiVaultContractAddress}
-            onCopyClick={onCopyDefiVaultAdr}
           />
         </Stack>
       </Stack>

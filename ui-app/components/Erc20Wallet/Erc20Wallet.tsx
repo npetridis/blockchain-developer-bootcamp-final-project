@@ -1,7 +1,7 @@
 import React from 'react';
 import { useToast } from 'hooks';
-import { Card } from 'components/common';
-import { Flex, Heading, Stack, Text } from '@chakra-ui/react';
+import { AddressCopy, Card } from 'components/common';
+import { Heading, Stack } from '@chakra-ui/react';
 import { BigNumber } from 'ethers';
 import {
   DepositTokenSection,
@@ -12,7 +12,6 @@ import {
   WithdrawTokenFormProps
 } from './WithdrawTokenSection';
 import { useDefiVaultContract } from 'hooks/useDefiVaultContract';
-import { formatAddress } from 'utils';
 
 export function Erc20Wallet(): JSX.Element {
   const { tokenBalances, depositToken, withdrawToken } =
@@ -59,14 +58,11 @@ export function Erc20Wallet(): JSX.Element {
       <Stack spacing="1em">
         <Card light py='1em'>
           {tokenBalances?.map(({ address, balance, name, symbol }) => (
-            <Flex key={address} justify='space-between'>
-              <Text>
-                {`${name} (${symbol}): ${balance.toString()}`}
-              </Text>
-              <Text>
-                {`${formatAddress(address, 10)}`}
-              </Text>
-            </Flex>
+            <AddressCopy fullWidth addressDigits={6}
+              key={address}
+              label={`${name} (${symbol}): ${balance.toString()}`}
+              address={address}
+            />
           ))}
         </Card>
         <DepositTokenSection onDepositToken={handleDepositToken} />

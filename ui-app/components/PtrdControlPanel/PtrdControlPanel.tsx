@@ -1,6 +1,6 @@
 import React from 'react';
-import { Accordion, Heading, Stack, useClipboard } from '@chakra-ui/react';
-import { Card } from 'components/common';
+import { Accordion, Heading, Stack } from '@chakra-ui/react';
+import { Card, AddressCopy } from 'components/common';
 import {
   TotalSupply,
   Allowance,
@@ -18,7 +18,6 @@ import { useErc20Token } from 'hooks/useErc20Token';
 import { BigNumber } from 'ethers';
 import { useToast } from 'hooks';
 import { SignerSelector } from './SignerSelector';
-import { AddressCopy } from './AddressCopy';
 
 const petrideumErc20ContractAddress = process.env
   .NEXT_PUBLIC_PETRIDEUM_ERC20_ADDRESS as string;
@@ -36,7 +35,6 @@ export function PtrdControlPanel(): JSX.Element {
     transferFrom,
   } = useErc20Token(petrideumErc20ContractAddress, signerPrivateKey);
   const { successTransactionToast, errorToast } = useToast();
-  const { onCopy } = useClipboard(petrideumErc20ContractAddress);
 
   const handleTransfer = async ({ recipient, amount }: TransferFormProps) => {
     try {
@@ -119,9 +117,8 @@ export function PtrdControlPanel(): JSX.Element {
       <Stack spacing="1em">
         <Card py="1em" light>
           <AddressCopy
-            label="PTRD contract address"
+            label="PTRD contract address:"
             address={petrideumErc20ContractAddress}
-            onCopyClick={onCopy}
           />
         </Card>
         <SignerSelector onSignerChange={setSignerPrivateKey} />
