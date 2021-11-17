@@ -129,7 +129,7 @@ export const useDefiVaultContract = (contractAddress: string | undefined): UseDe
       successTransactionToast({ txHash: tx.hash });
       const txData = await tx.wait();
 
-      const withdrawErc20event = txData.events.find(e => e?.event === Events.WithdrawErc20);
+      const withdrawErc20event = txData.events.find((e: any) => e?.event === Events.WithdrawErc20);
       const newBalance = withdrawErc20event.args[3] as BigNumber;
 
       updateAllTokensBalance()
@@ -161,7 +161,7 @@ export const useDefiVaultContract = (contractAddress: string | undefined): UseDe
       successTransactionToast({ txHash: tx.hash });
       const txData = await tx.wait();
 
-      const depositErc20event = txData.events.find(e => e?.event === Events.DepositErc20);
+      const depositErc20event = txData.events.find((e: any) => e?.event === Events.DepositErc20);
       // const newBalance = depositErc20event.args[3] as BigNumber;
 
       updateAllTokensBalance();

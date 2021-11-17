@@ -29,7 +29,7 @@ export function Erc20Wallet(): JSX.Element {
         BigNumber.from(amount)
       );
       successConfirmationToast({ title: 'Deposit was successful!', txData });
-    } catch (error) {
+    } catch (error: any) {
       errorToast({ error });
     }
   };
@@ -44,7 +44,7 @@ export function Erc20Wallet(): JSX.Element {
         BigNumber.from(amount)
       );
       successConfirmationToast({ title: 'Withdrawal was successful!', txData });
-    } catch (error) {
+    } catch (error: any) {
       errorToast({ error });
     }
   };

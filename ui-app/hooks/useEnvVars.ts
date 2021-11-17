@@ -23,7 +23,7 @@ export function useEnvVars(): EnvVars {
   React.useEffect(() => {
     const chainId = window.ethereum.networkVersion;
     setActiveNetwork(chainId);
-    window.ethereum.on('chainChanged', (_chainId) => window.location.reload());
+    window.ethereum.on('chainChanged', (_chainId: string) => window.location.reload());
   }, []);
 
   switch (activeNetwork) {

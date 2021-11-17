@@ -9,10 +9,13 @@ const formatEtherBalance = (balance: BigNumber = BigNumber.from(0)): string => {
 
 type WalletInfoProps = {
   balance: BigNumber;
-  address: string;
+  address: string | undefined;
 };
 
 export function WalletInfo({ balance, address }: WalletInfoProps) {
+  if (!address) {
+    return null;
+  }
   return (
     <HStack
       width="max-content"

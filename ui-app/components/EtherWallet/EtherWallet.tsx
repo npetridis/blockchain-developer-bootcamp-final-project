@@ -28,7 +28,7 @@ export function EtherWallet(): JSX.Element {
     try {
       const txData = await depositEther(utils.parseEther(etherAmount));
       successConfirmationToast({ title: 'Withdrawal was successful!', txData });
-    } catch (error) {
+    } catch (error: any) {
       errorToast({ error });
     }
   };
@@ -39,7 +39,7 @@ export function EtherWallet(): JSX.Element {
     try {
       const txData = await withdrawEther(utils.parseEther(etherAmount));
       successConfirmationToast({ title: 'Withdrawal was successful!', txData });
-    } catch (error) {
+    } catch (error: any) {
       errorToast({ error });
     }
   };

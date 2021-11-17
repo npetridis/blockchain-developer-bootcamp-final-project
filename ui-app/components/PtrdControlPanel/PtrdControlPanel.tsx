@@ -38,7 +38,7 @@ export function PtrdControlPanel(): JSX.Element {
     try {
       const txData = await transfer(recipient, BigNumber.from(amount));
       successConfirmationToast({ title: 'Transfer was successful!', txData });
-    } catch (error) {
+    } catch (error: any) {
       errorToast({ error });
     }
   };
@@ -47,7 +47,7 @@ export function PtrdControlPanel(): JSX.Element {
     try {
       const data = await getTotalSupply();
       return data ? data.toString() : '0.0';
-    } catch (error) {
+    } catch (error: any) {
       errorToast({ error });
     }
     return '0.0';
@@ -59,7 +59,7 @@ export function PtrdControlPanel(): JSX.Element {
     try {
       const data = await getBalanceOf(address);
       return data ? data?.toString() : '0.0';
-    } catch (error) {
+    } catch (error: any) {
       errorToast({ error });
     }
     return '0.0';
@@ -72,7 +72,7 @@ export function PtrdControlPanel(): JSX.Element {
     try {
       const data = await getAllowance(ownerAddress, spenderAddress);
       return data ? data?.toString() : '0.0';
-    } catch (error) {
+    } catch (error: any) {
       errorToast({ error });
     }
     return '0.0';
@@ -82,7 +82,7 @@ export function PtrdControlPanel(): JSX.Element {
     try {
       const txData = await approve(address, BigNumber.from(amount));
       successConfirmationToast({ title: 'Approval was successful!', txData });
-    } catch (error) {
+    } catch (error: any) {
       errorToast({ error });
     }
   };
@@ -102,7 +102,7 @@ export function PtrdControlPanel(): JSX.Element {
         title: 'TransferFrom was successful!',
         txData,
       });
-    } catch (error) {
+    } catch (error: any) {
       errorToast({ error });
     }
   };
