@@ -1,6 +1,6 @@
 import React from 'react';
 import { BigNumber, ethers } from 'ethers';
-import etherWalletAbiJson from '../../smart-contracts/build/contracts/EtherWallet.json';
+import etherWalletAbiJson from 'abi/EtherWallet.json';
 import { useWeb3Provider } from 'contexts/web3';
 import { useSigner } from './useSigner';
 

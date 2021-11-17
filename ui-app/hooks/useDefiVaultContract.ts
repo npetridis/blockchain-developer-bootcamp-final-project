@@ -1,6 +1,6 @@
 import React from 'react';
 import { BigNumber, ethers } from 'ethers';
-import defiVaultAbiJson from '../../smart-contracts/build/contracts/DefiVault.json';
+import defiVaultAbiJson from 'abi/DefiVault.json';
 import { useWeb3Provider } from 'contexts/web3';
 import { useSigner } from './useSigner';
 import { useErc20Info } from './useErc20Info';

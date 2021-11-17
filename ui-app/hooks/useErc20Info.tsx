@@ -1,7 +1,7 @@
 import React from 'react';
 import { ethers } from 'ethers';
 import { useWeb3Provider } from 'contexts/web3';
-import erc20AbiJson from '../../smart-contracts/build/contracts/ERC20.json';
+import erc20AbiJson from 'abi/ERC20.json';
 
 type Erc20Info = {
   name: string;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { BigNumber, ethers, Signer } from 'ethers';
-import erc20AbiJson from '../abi/ERC20.json';
+import { BigNumber, ethers } from 'ethers';
+import erc20AbiJson from 'abi/ERC20.json';
 import { useWeb3Provider } from 'contexts/web3';
 import { useSigner } from './useSigner';
 import { useToast } from './useToast';
