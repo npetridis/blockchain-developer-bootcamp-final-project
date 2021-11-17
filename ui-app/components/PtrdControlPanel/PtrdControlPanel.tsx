@@ -16,13 +16,11 @@ import {
 } from './operations';
 import { useErc20Token } from 'hooks/useErc20Token';
 import { BigNumber } from 'ethers';
-import { useToast } from 'hooks';
+import { useEnvVars, useToast } from 'hooks';
 import { SignerSelector } from './SignerSelector';
 
-const petrideumErc20ContractAddress = process.env
-  .NEXT_PUBLIC_PETRIDEUM_ERC20_ADDRESS as string;
-
 export function PtrdControlPanel(): JSX.Element {
+  const { petrideumErc20ContractAddress } = useEnvVars();
   const [signerPrivateKey, setSignerPrivateKey] = React.useState<
     string | undefined
   >();
@@ -34,12 +32,12 @@ export function PtrdControlPanel(): JSX.Element {
     approve,
     transferFrom,
   } = useErc20Token(petrideumErc20ContractAddress, signerPrivateKey);
-  const { successTransactionToast, errorToast } = useToast();
+  const { successConfirmationToast, errorToast } = useToast();
 
   const handleTransfer = async ({ recipient, amount }: TransferFormProps) => {
     try {
       const txData = await transfer(recipient, BigNumber.from(amount));
-      successTransactionToast({ title: 'Transfer was successful!', txData });
+      successConfirmationToast({ title: 'Transfer was successful!', txData });
     } catch (error) {
       errorToast({ error });
     }
@@ -83,7 +81,7 @@ export function PtrdControlPanel(): JSX.Element {
   const handleApprove = async ({ address, amount }: ApproveFormProps) => {
     try {
       const txData = await approve(address, BigNumber.from(amount));
-      successTransactionToast({ title: 'Approval was successful!', txData });
+      successConfirmationToast({ title: 'Approval was successful!', txData });
     } catch (error) {
       errorToast({ error });
     }
@@ -100,7 +98,7 @@ export function PtrdControlPanel(): JSX.Element {
         recipient,
         BigNumber.from(amount)
       );
-      successTransactionToast({
+      successConfirmationToast({
         title: 'TransferFrom was successful!',
         txData,
       });

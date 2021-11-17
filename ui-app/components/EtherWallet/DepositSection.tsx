@@ -48,7 +48,7 @@ export function DepositSection({
                 utils.parseEther(value).gt(BigNumber.from(0)),
             })}
             disabled={!isConnected}
-            step="0.01"
+            step="any"
           />
         </Box>
         {isConnected ? (

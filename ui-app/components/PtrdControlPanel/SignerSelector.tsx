@@ -1,22 +1,16 @@
 import React from 'react';
 import {
+  Center,
   Heading,
   Select,
   Stack,
+  Spinner
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import { Card, AddressCopy } from 'components/common';
-import { useSigner } from 'hooks';
+import { useEnvVars, useSigner } from 'hooks';
 import { useWeb3Provider } from 'contexts/web3';
 import { formatAddress } from 'utils';
-
-// A private key shouldn't get exposed
-// Τhis is only for test reasons to demonstate the smart contract functionality
-const ptrdOwnerPrivateKey = process.env
-  .NEXT_PUBLIC_PETRIDEUM_OWNER_PRIVATE_KEY as string;
-
-const defiVaultContractAddress = process.env
-  .NEXT_PUBLIC_DEFI_VAULT_CONTRACT_ADDRESS as string;
 
 type SignerSelectorProps = {
   onSignerChange: (pk: string | undefined) => void;
@@ -26,10 +20,10 @@ export function SignerSelector({
   onSignerChange,
 }: SignerSelectorProps): JSX.Element {
   const provider = useWeb3Provider();
+  const { petrideumOwnerPrivateKey, defiVaultContractAddress } = useEnvVars();
   const { getSigner } = useSigner();
-  const [ptrdDeployerAddress, setPtrdDeployerAddress] =
-    React.useState<string>('');
-  const [metamaskAddress, setMetamaskAddress] = React.useState<string>('');
+  const [ptrdDeployerAddress, setPtrdDeployerAddress] = React.useState('');
+  const [metamaskAddress, setMetamaskAddress] = React.useState('');
 
   const updateMetamaskAddress = async function () {
     const metamaskSigner = await getSigner();
@@ -41,10 +35,16 @@ export function SignerSelector({
   };
 
   React.useEffect(() => {
-    if (!provider) {
+    if (petrideumOwnerPrivateKey) {
+      onSignerChange(petrideumOwnerPrivateKey);
+    }
+  }, [petrideumOwnerPrivateKey]);
+
+  React.useEffect(() => {
+    if (!provider || !petrideumOwnerPrivateKey) {
       return;
     }
-    const ptrdSigner = new ethers.Wallet(ptrdOwnerPrivateKey, provider);
+    const ptrdSigner = new ethers.Wallet(petrideumOwnerPrivateKey, provider);
     if (!ptrdSigner) return;
 
     const updatePtrdAddress = async function () {
@@ -60,7 +60,7 @@ export function SignerSelector({
     return () => {
       window.ethereum.removeListener('accountsChanged', updateMetamaskAddress);
     };
-  }, [provider]);
+  }, [provider, petrideumOwnerPrivateKey]);
 
   const handleSelectChange = ({
     target: { value },
@@ -68,6 +68,14 @@ export function SignerSelector({
     console.log('BBBBB', value);
     onSignerChange(value === 'metamaskProvider' ? undefined : value);
   };
+
+  if (!petrideumOwnerPrivateKey || !defiVaultContractAddress) {
+    return (
+      <Center h='237px'>
+        <Spinner color='white'/>
+      </Center>
+    )
+  }
 
   return (
     <Card light>
@@ -81,7 +89,7 @@ export function SignerSelector({
           color="text.regular"
           onChange={handleSelectChange}
         >
-          <option value={ptrdOwnerPrivateKey}>
+          <option value={petrideumOwnerPrivateKey}>
             {formatAddress(ptrdDeployerAddress, 12)} (PTRD contract deployer)
           </option>
           <option value="metamaskProvider">
@@ -90,7 +98,7 @@ export function SignerSelector({
         </Select>
         <Stack spacing="0.25em">
           <AddressCopy
-            label="PTRD manager address:"
+            label="PTRD contract deployer:"
             address={ptrdDeployerAddress}
           />
           <AddressCopy

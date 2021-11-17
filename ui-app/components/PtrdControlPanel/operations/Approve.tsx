@@ -43,7 +43,7 @@ export function Approve({ onClick }: ApproveProps) {
             id="amount"
             type="number"
             placeholder="0.0"
-            step="0.01"
+            step="any"
             {...register('amount', {
               required: true,
               validate: (value) =>

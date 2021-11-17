@@ -9,12 +9,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "predeploy": "rm -rf ./build",
-    "deploy": "truffle compile;truffle migrate"
+    "predeploy:ropsten": "rm -rf ./build",
+    "deploy": "truffle compile;truffle migrate --network development",
+    "deploy:ropsten": "truffle compile;truffle deploy --network ropsten",
+    "postdeploy": "./scripts/copyAbisToUI.sh",
+    "postdeploy:ropsten": "./scripts/copyAbisToUI.sh"
   },
   "keywords": [],
   "author": "Nikos Petridis",
   "license": "ISC",
   "dependencies": {
+    "@truffle/hdwallet-provider": "^1.6.0",
     "openzeppelin-solidity": "4.3.2"
   }
 }

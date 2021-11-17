@@ -38,7 +38,7 @@ export const useSigner = () => {
     const signer = provider.getSigner();
     console.log('SIGNER', signer);
 
-    signer.getAddress()
+    signer.getAddress();
     // signer.connect(window.ethereum); // TODO FIXX
 
     const addr = await signer.getAddress();

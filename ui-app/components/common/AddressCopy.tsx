@@ -5,13 +5,17 @@ import { formatAddress } from 'utils';
 
 type AddressCopyProps = {
   label: string;
-  address: string;
+  address: string | undefined;
   addressDigits?: number;
   fullWidth?: boolean;
 };
 
 export function AddressCopy({ label, address, fullWidth, addressDigits = 8 }: AddressCopyProps) {
-  const { onCopy } = useClipboard(address);
+  const { onCopy } = useClipboard(address || '');
+
+  if (!address) {
+    return null;
+  }
 
   return (
     <HStack>

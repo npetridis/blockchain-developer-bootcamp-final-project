@@ -1,3 +1,13 @@
+const HDWalletProvider = require('@truffle/hdwallet-provider')
+
+const PRIVATE_KEYS = {
+  ropsten: '5a21febe1c40389510aed9e3b627b34b5dd0ac603bbc56bfce437d23a5b76806'
+}
+
+const INFURA_URLS = {
+  ropsten: 'https://ropsten.infura.io/v3/15c2e8fee7c04556986494cb86fc4d2d'
+}
+
 module.exports = {
   // Uncommenting the defaults below 
   // provides for an easier quick-start with Ganache.
@@ -20,6 +30,24 @@ module.exports = {
       host: "127.0.0.1",
       port: 7545,
       network_id: "*"
+    },
+    ropsten: {
+      provider: function() {
+        return new HDWalletProvider({
+          privateKeys: [PRIVATE_KEYS.ropsten],
+          providerOrUrl: INFURA_URLS.ropsten,
+          numberOfAddresses: 1
+        })
+      },
+      network_id: 3,
+      gas: 4000000      //make sure this gas allocation isn't over 4M, which is the max
+    },
+    rinkeby: {
+      provider: function() {
+        return new HDWalletProvider(MNEMONIC, "https://ropsten.infura.io/YOUR_API_KEY")
+      },
+      network_id: 4,
+      gas: 4000000      //make sure this gas allocation isn't over 4M, which is the max
     }
   },
   //

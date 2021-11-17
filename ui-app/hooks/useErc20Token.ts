@@ -1,8 +1,9 @@
 import React from 'react';
 import { BigNumber, ethers, Signer } from 'ethers';
-import erc20AbiJson from '../../smart-contracts/build/contracts/ERC20.json';
+import erc20AbiJson from '../abi/ERC20.json';
 import { useWeb3Provider } from 'contexts/web3';
 import { useSigner } from './useSigner';
+import { useToast } from './useToast';
 
 type TokenData = {
   name: string;
@@ -27,16 +28,17 @@ type UseErc20Token = TokenData & {
 };
 
 export const useErc20Token = (
-  contractAddress: string,
+  contractAddress: string | undefined,
   signerPrivateKey?: string
 ): UseErc20Token => {
   const provider = useWeb3Provider();
   const { getSigner } = useSigner();
   const [contract, setContract] = React.useState<ethers.Contract | null>(null);
   const [tokenData, setTokenData] = React.useState<TokenData>(INITIAL_DATA);
+  const { successTransactionToast } = useToast();
 
   React.useEffect(() => {
-    if (!provider) {
+    if (!provider || !contractAddress) {
       return;
     }
 
@@ -55,12 +57,11 @@ export const useErc20Token = (
       setTokenData({ name, symbol, totalSupply: totalSupply });
     };
     getTokenData();
-  }, [provider]
-  );
+  }, [provider, contractAddress]);
 
   const getTotalSupply = React.useCallback(
     async (): Promise<BigNumber | null> => {
-      if (!provider) {
+      if (!provider || !contractAddress) {
         return null;
       }
 
@@ -73,12 +74,12 @@ export const useErc20Token = (
       if (!contract) return null;
       const result = await contract.totalSupply();
       return result;
-    }, [provider]
+    }, [provider, contractAddress]
   );
 
   const getBalanceOf = React.useCallback(
     async (accountAddress: string): Promise<BigNumber | null> => {
-      if (!provider) {
+      if (!provider || !contractAddress) {
         return null;
       }
 
@@ -93,11 +94,11 @@ export const useErc20Token = (
 
       console.log('result', typeof result, result);
       return result;
-    }, [provider]);
+    }, [provider, contractAddress]);
 
   const getAllowance = React.useCallback(
     async (ownerAddress: string, spenderAddress: string): Promise<BigNumber | null> => {
-      if (!provider) {
+      if (!provider || !contractAddress) {
         return null;
       }
 
@@ -112,16 +113,17 @@ export const useErc20Token = (
 
       console.log('result', typeof result, result);
       return result;
-    }, [provider]
+    }, [provider, contractAddress]
   );
 
   const transfer = React.useCallback(
     async (recipientAddress: string, amount: BigNumber) => {
-      if (!provider) {
+      if (!provider || !contractAddress) {
         return null;
       }
 
       let signer;
+      console.log('prepei', signerPrivateKey)
       if (signerPrivateKey) {
         signer = new ethers.Wallet(signerPrivateKey, provider);
       } else {
@@ -140,17 +142,16 @@ export const useErc20Token = (
 
       if (!contract) return null;
       const tx = await contract.transfer(recipientAddress, amount.toString());
-      const result = await tx.wait();
+      successTransactionToast({ txHash: tx.hash });
+      const txData = await tx.wait();
 
-      console.log('data', recipientAddress, amount.toString());
-      console.log('result', typeof result, result);
-      return result;
-    }, [provider, signerPrivateKey]
+      return txData;
+    }, [provider, contractAddress, signerPrivateKey]
   );
 
   const approve = React.useCallback(
     async (spenderAddress: string, amount: BigNumber) => {
-      if (!provider) {
+      if (!provider || !contractAddress) {
         return null;
       }
 
@@ -173,16 +174,16 @@ export const useErc20Token = (
 
       if (!contract) return null;
       const tx = await contract.approve(spenderAddress, amount.toString());
-      const result = await tx.wait();
+      successTransactionToast({ txHash: tx.hash });
+      const txData = await tx.wait();
 
-      console.log('result', typeof result, result);
-      return result;
-    }, [provider, signerPrivateKey]
+      return txData;
+    }, [provider, contractAddress, signerPrivateKey]
   );
 
   const transferFrom = React.useCallback(
     async (senderAddress: string, recipientAddress: string, amount: BigNumber) => {
-      if (!provider) {
+      if (!provider || !contractAddress) {
         return null;
       }
 
@@ -204,11 +205,11 @@ export const useErc20Token = (
 
       if (!contract) return null;
       const tx = await contract.transferFrom(senderAddress, recipientAddress, amount.toString());
-      const result = await tx.wait();
+      successTransactionToast({ txHash: tx.hash });
+      const txData = await tx.wait();
 
-      console.log('result', typeof result, result);
-      return result;
-    }, [provider, signerPrivateKey]
+      return txData;
+    }, [provider, contractAddress, signerPrivateKey]
   );
 
   return {

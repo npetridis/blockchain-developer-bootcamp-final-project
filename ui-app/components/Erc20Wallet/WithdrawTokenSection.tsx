@@ -45,8 +45,6 @@ export function WithdrawTokenSection({
             placeholder="0x0000...0000"
             {...register('contractAddress', {
               required: true,
-              // validate: (value) =>
-              //   utils.parseEther(value).gt(BigNumber.from(0)),
             })}
             disabled={!isConnected}
           />
@@ -63,7 +61,7 @@ export function WithdrawTokenSection({
                 utils.parseEther(value).gt(BigNumber.from(0)),
             })}
             disabled={!isConnected}
-            step="0.01"
+            step="any"
           />
         </Box>
         {isConnected ? (

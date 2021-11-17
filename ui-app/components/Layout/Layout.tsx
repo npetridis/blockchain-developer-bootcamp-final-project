@@ -61,7 +61,7 @@ export function Layout({ children }: Props) {
         left="0"
         width="200vw"
         height="200vw"
-        bg="radial-gradient(50% 50% at 50% 50%,#fc077d10 0,rgba(255,255,255,0) 100%)"
+        bg="radial-gradient(50% 50% at 50% 50%,#ffa50c2b 0,rgb(255 255 255 / 0%) 100%)"
         transform="translate(-50vw, -100vh)"
         pointerEvents="none"
       />

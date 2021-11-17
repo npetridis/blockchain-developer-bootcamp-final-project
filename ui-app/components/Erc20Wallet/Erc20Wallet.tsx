@@ -1,7 +1,7 @@
 import React from 'react';
-import { useToast } from 'hooks';
+import { useEnvVars, useToast } from 'hooks';
 import { AddressCopy, Card } from 'components/common';
-import { Heading, Stack } from '@chakra-ui/react';
+import { Heading, Stack, Text } from '@chakra-ui/react';
 import { BigNumber } from 'ethers';
 import {
   DepositTokenSection,
@@ -14,11 +14,10 @@ import {
 import { useDefiVaultContract } from 'hooks/useDefiVaultContract';
 
 export function Erc20Wallet(): JSX.Element {
+  const { defiVaultContractAddress } = useEnvVars();
   const { tokenBalances, depositToken, withdrawToken } =
-    useDefiVaultContract(
-      process.env.NEXT_PUBLIC_DEFI_VAULT_CONTRACT_ADDRESS as string
-    );
-  const { successTransactionToast, errorToast } = useToast();
+    useDefiVaultContract(defiVaultContractAddress);
+  const { successConfirmationToast, errorToast } = useToast();
 
   const handleDepositToken = async ({
     contractAddress,
@@ -29,7 +28,7 @@ export function Erc20Wallet(): JSX.Element {
         contractAddress,
         BigNumber.from(amount)
       );
-      successTransactionToast({ title: 'Deposit was successful!', txData });
+      successConfirmationToast({ title: 'Deposit was successful!', txData });
     } catch (error) {
       errorToast({ error });
     }
@@ -44,7 +43,7 @@ export function Erc20Wallet(): JSX.Element {
         contractAddress,
         BigNumber.from(amount)
       );
-      successTransactionToast({ title: 'Withdrawal was successful!', txData });
+      successConfirmationToast({ title: 'Withdrawal was successful!', txData });
     } catch (error) {
       errorToast({ error });
     }
@@ -64,6 +63,9 @@ export function Erc20Wallet(): JSX.Element {
               address={address}
             />
           ))}
+          {!tokenBalances?.length ? (
+            <Text>The wallet is empty</Text>
+          ) : null}
         </Card>
         <DepositTokenSection onDepositToken={handleDepositToken} />
         <WithdrawTokenSection onWithdrawToken={handleWithdrawEther} />

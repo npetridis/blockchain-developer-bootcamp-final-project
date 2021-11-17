@@ -9,29 +9,35 @@ console.log('etherWalletAbiJson', etherWalletAbiJson);
 
 type UseEtherWalletContract = {
   // contract: ethers.Contract | null;
-  depositEther: (etherAmount: BigNumber) => Promise<BigNumber | null>;
-  withdrawEther: (etherAmount: BigNumber) => Promise<BigNumber | null>;
+  depositEther: (etherAmount: BigNumber) => Promise<any>;
+  withdrawEther: (etherAmount: BigNumber) => Promise<any>;
   updateEtherBalance: () => Promise<BigNumber>;
   etherBalance: BigNumber;
 };
 
-export const useEtherWalletContract = (contractAddress: string): UseEtherWalletContract => {
+export const useEtherWalletContract = (contractAddress: string | undefined): UseEtherWalletContract => {
   const provider = useWeb3Provider();
   const { getSigner } = useSigner();
   const [etherBalance, setEtherBalance] = React.useState(BigNumber.from(0));
-  // const [contract, setContract] = React.useState<ethers.Contract | null>(null);
 
   const updateEtherBalance = React.useCallback(
     async () => {
-      if (!provider) {
+      if (!provider || !contractAddress) {
         return;
+      }
+
+      const signer = await getSigner()
+      if (!signer) {
+        console.log('No signer');
+        return null;
       }
 
       const contract = new ethers.Contract(
         contractAddress,
         etherWalletAbiJson.abi,
-        provider
+        signer
       );
+
 
       if (!contract) return null;
       const result = await contract.getEtherBalance();
@@ -40,16 +46,16 @@ export const useEtherWalletContract = (contractAddress: string): UseEtherWalletC
       setEtherBalance(result);
       return result;
     },
-    [provider]
+    [provider, setEtherBalance, contractAddress]
   );
 
   React.useEffect(() => {
     updateEtherBalance();
-  }, [provider]);
+  }, [provider, contractAddress, updateEtherBalance]);
 
   const withdrawEther = React.useCallback(
-    async (etherAmount: BigNumber): Promise<BigNumber | null> => {
-      if (!provider) {
+    async (etherAmount: BigNumber): Promise<any> => {
+      if (!provider || !contractAddress) {
         return null;
       }
 
@@ -67,20 +73,20 @@ export const useEtherWalletContract = (contractAddress: string): UseEtherWalletC
 
       if (!contract) return null;
       const tx = await contract.withdrawEther(etherAmount.toString());
-      const result = await tx.wait();
+      const txData = await tx.wait();
 
-      const withdrawEvent = result.events[0];
+      const withdrawEvent = txData.events[0];
       const newBalance = withdrawEvent.args[2] as BigNumber;
 
       setEtherBalance(newBalance);
-      return newBalance;
+      return txData;
     },
-    [provider]
+    [provider, contractAddress]
   );
 
   const depositEther = React.useCallback(
-    async (etherAmount: BigNumber): Promise<BigNumber | null> => {
-      if (!provider) {
+    async (etherAmount: BigNumber): Promise<any> => {
+      if (!provider || !contractAddress) {
         return null;
       }
 
@@ -98,9 +104,9 @@ export const useEtherWalletContract = (contractAddress: string): UseEtherWalletC
 
       if (!contract) return null;
       const tx = await contract.depositEther({ value: etherAmount });
-      const result = await tx.wait();
+      const txData = await tx.wait();
 
-      const depositEvent = result.events[0];
+      const depositEvent = txData.events[0];
       const newBalance = depositEvent.args[2] as BigNumber;
       // provider.once(tx.hash, (transaction) => {
       //   // Emitted when the transaction has been mined
@@ -108,9 +114,9 @@ export const useEtherWalletContract = (contractAddress: string): UseEtherWalletC
       // })
 
       setEtherBalance(newBalance);
-      return newBalance;
+      return txData;
     },
-    [provider]
+    [provider, contractAddress]
   );
 
   return {

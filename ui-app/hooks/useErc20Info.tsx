@@ -19,7 +19,7 @@ export function useErc20Info(): UseErc20Info {
   
   const getErc20Info = React.useCallback(
     async (contractAddress: string): Promise<Erc20Info> => {
-      if (!provider) {
+      if (!provider || !contractAddress) {
         return NOT_FOUND_INFO;
       }
 

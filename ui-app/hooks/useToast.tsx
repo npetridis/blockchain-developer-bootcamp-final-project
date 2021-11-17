@@ -6,7 +6,11 @@ type SuccessToastProps = {
   description?: string | React.ReactNode;
 };
 
-type SuccessTransactionToastProps = {
+type SuccessTransctionToastProps = {
+  txHash: string;
+};
+
+type SuccessConfirmationToastProps = {
   title: string | React.ReactNode;
   txData?: {
     confirmations?: number;
@@ -21,6 +25,8 @@ type ErrorToastProps = {
   description?: string | React.ReactNode;
 };
 
+const TOAST_DURATION = 10000;
+
 export const useToast = () => {
   const toast = useChakraToast();
 
@@ -32,15 +38,30 @@ export const useToast = () => {
         isClosable: true,
         title,
         description,
+        duration: TOAST_DURATION
       });
     },
     [toast]
   );
 
-  const successTransactionToast = ({
+  const successTransactionToast = ({ txHash }: SuccessTransctionToastProps) => {
+    successToast({
+      title: 'Transaction was successful',
+      description: (
+        <>
+          <div>Waiting for confirmation...</div>
+          <div>
+            Tx hash: <div>{txHash}</div>
+          </div>
+        </>
+      )
+    });
+  };
+
+  const successConfirmationToast = ({
     title,
     txData,
-  }: SuccessTransactionToastProps) => {
+  }: SuccessConfirmationToastProps) => {
     const confirmationsLiteral = txData
       ? `(confirmations: ${txData?.confirmations || 1})`
       : '';
@@ -69,6 +90,7 @@ export const useToast = () => {
           error?.value ||
           description ||
           'Please try again later!',
+        duration: TOAST_DURATION
       });
     },
     [toast]
@@ -78,5 +100,6 @@ export const useToast = () => {
     successToast,
     errorToast,
     successTransactionToast,
+    successConfirmationToast
   };
 };

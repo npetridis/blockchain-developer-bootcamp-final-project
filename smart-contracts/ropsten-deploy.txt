@@ -1,0 +1,171 @@
+yarn deploy:ropsten
+yarn run v1.22.11
+$ rm -rf ./build
+$ truffle compile;truffle deploy --network ropsten
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/DefiVault.sol
+> Compiling ./contracts/EtherWallet.sol
+> Compiling ./contracts/Migrations.sol
+> Compiling ./contracts/Petrideum.sol
+> Compiling openzeppelin-solidity/contracts/token/ERC20/ERC20.sol
+> Compiling openzeppelin-solidity/contracts/token/ERC20/IERC20.sol
+> Compiling openzeppelin-solidity/contracts/token/ERC20/extensions/IERC20Metadata.sol
+> Compiling openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol
+> Compiling openzeppelin-solidity/contracts/utils/Address.sol
+> Compiling openzeppelin-solidity/contracts/utils/Context.sol
+> Artifacts written to /Users/nikospetridis/projects/blockchain/blockchain-developer-bootcamp-final-project/smart-contracts/build/contracts
+> Compiled successfully using:
+   - solc: 0.8.9+commit.e5eed63a.Emscripten.clang
+
+
+Compiling your contracts...
+===========================
+> Everything is up to date, there is nothing to compile.
+
+
+
+Migrations dry-run (simulation)
+===============================
+> Network name:    'ropsten-fork'
+> Network id:      3
+> Block gas limit: 8000000 (0x7a1200)
+
+
+1_initial_migration.js
+======================
+
+   Deploying 'Migrations'
+   ----------------------
+   > block number:        11440010
+   > block timestamp:     1637113963
+   > account:             0x47F3d3963133903a74A625962f42Fe36e95f2cDD
+   > balance:             0.29551824894591863
+   > gas used:            186843 (0x2d9db)
+   > gas price:           2 gwei
+   > value sent:          0 ETH
+   > total cost:          0.000373686 ETH
+
+   -------------------------------------
+   > Total cost:         0.000373686 ETH
+
+
+2_deploy_contracts.js
+=====================
+
+   Deploying 'Petrideum'
+   ---------------------
+   > block number:        11440012
+   > block timestamp:     1637113979
+   > account:             0x47F3d3963133903a74A625962f42Fe36e95f2cDD
+   > balance:             0.29308908894591863
+   > gas used:            1187064 (0x121cf8)
+   > gas price:           2 gwei
+   > value sent:          0 ETH
+   > total cost:          0.002374128 ETH
+
+
+   Deploying 'DefiVault'
+   ---------------------
+   > block number:        11440013
+   > block timestamp:     1637113987
+   > account:             0x47F3d3963133903a74A625962f42Fe36e95f2cDD
+   > balance:             0.28934842694591863
+   > gas used:            1870331 (0x1c89fb)
+   > gas price:           2 gwei
+   > value sent:          0 ETH
+   > total cost:          0.003740662 ETH
+
+   -------------------------------------
+   > Total cost:          0.00611479 ETH
+
+
+Summary
+=======
+> Total deployments:   3
+> Final cost:          0.006488476 ETH
+
+
+
+
+
+Starting migrations...
+======================
+> Network name:    'ropsten'
+> Network id:      3
+> Block gas limit: 8000000 (0x7a1200)
+
+
+1_initial_migration.js
+======================
+
+   Deploying 'Migrations'
+   ----------------------
+   > transaction hash:    0x4f9440011ad8c63fd1e48938e5263bf40a6e334f983e5fa9240aef1b8e08c915
+   > Blocks: 1            Seconds: 12
+   > contract address:    0xfa2fd88e4E549C62DA2d98F16681A276F37b0fE2
+   > block number:        11440011
+   > block timestamp:     1637113985
+   > account:             0x47F3d3963133903a74A625962f42Fe36e95f2cDD
+   > balance:             0.295688791942465199
+   > gas used:            203143 (0x31987)
+   > gas price:           1.000000017 gwei
+   > value sent:          0 ETH
+   > total cost:          0.000203143003453431 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.000203143003453431 ETH
+
+
+2_deploy_contracts.js
+=====================
+
+   Deploying 'Petrideum'
+   ---------------------
+   > transaction hash:    0xea8b92de5f6d5e86d6d72ce9b0ab26f9793628ce91cd1eb6257ef7bc31033e69
+   > Blocks: 0            Seconds: 8
+   > contract address:    0xFFA6Ad727163A49D1034EF36aA58aD6A1F96e6B5
+   > block number:        11440015
+   > block timestamp:     1637114037
+   > account:             0x47F3d3963133903a74A625962f42Fe36e95f2cDD
+   > balance:             0.294390611922946583
+   > gas used:            1252264 (0x131ba8)
+   > gas price:           1.000000015 gwei
+   > value sent:          0 ETH
+   > total cost:          0.00125226401878396 ETH
+
+
+   Deploying 'DefiVault'
+   ---------------------
+   > transaction hash:    0xdcf02a8db0166b388572ebb5c74191100cd2562c24bfd83ffccd60cea6e068cb
+   > Blocks: 2            Seconds: 24
+   > contract address:    0x144e6cA4529BA41A79616a8Cf3169c51300b3a2A
+   > block number:        11440018
+   > block timestamp:     1637114078
+   > account:             0x47F3d3963133903a74A625962f42Fe36e95f2cDD
+   > balance:             0.292520280891150956
+   > gas used:            1870331 (0x1c89fb)
+   > gas price:           1.000000017 gwei
+   > value sent:          0 ETH
+   > total cost:          0.001870331031795627 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.003122595050579587 ETH
+
+
+Summary
+=======
+> Total deployments:   3
+> Final cost:          0.003325738054033018 ETH
+
+
+
+$ ./scripts/copyAbisToUI.sh
+✨  Done in 161.97s.

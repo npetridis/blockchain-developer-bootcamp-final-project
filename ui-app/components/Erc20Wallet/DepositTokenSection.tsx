@@ -59,11 +59,11 @@ export function DepositTokenSection({
             placeholder="0.0"
             {...register('amount', {
               required: true,
-              validate: (value) =>
-                utils.parseEther(value).gt(BigNumber.from(0)),
+              // validate: (value) =>
+              //   utils.parseEther(value).gt(BigNumber.from(0)),
             })}
             disabled={!isConnected}
-            step="0.01"
+            step="any"
           />
         </Box>
         {isConnected ? (

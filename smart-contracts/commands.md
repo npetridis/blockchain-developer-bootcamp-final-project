@@ -15,18 +15,22 @@ truffle compile
 
 ```
 truffle migrate
+
+truffle deploy --network ropsten
 ```
 
 ## Console to interact with the contracts
 
 ```
 truffle console
+truffle console --network ropsten
 ```
 
 ### Examples
 
 ```
 let ptrd = await Petrideum.deployed()
+let defi = await DefiVault.deployed()
 let accounts = await web3.eth.getAccounts()
 let balance = await instance.getBalance(accounts[0])
 balance.toNumber()
