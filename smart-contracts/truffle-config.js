@@ -1,11 +1,13 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider')
 
 const PRIVATE_KEYS = {
-  ropsten: '5a21febe1c40389510aed9e3b627b34b5dd0ac603bbc56bfce437d23a5b76806'
+  ropsten: '5a21febe1c40389510aed9e3b627b34b5dd0ac603bbc56bfce437d23a5b76806',
+  rinkeby: ''
 }
 
 const INFURA_URLS = {
-  ropsten: 'https://ropsten.infura.io/v3/15c2e8fee7c04556986494cb86fc4d2d'
+  ropsten: 'https://ropsten.infura.io/v3/15c2e8fee7c04556986494cb86fc4d2d',
+  rinkeby: 'https://rinkeby.infura.io/v3/15c2e8fee7c04556986494cb86fc4d2d'
 }
 
 module.exports = {
@@ -43,11 +45,16 @@ module.exports = {
       gas: 4000000      //make sure this gas allocation isn't over 4M, which is the max
     },
     rinkeby: {
-      provider: function() {
-        return new HDWalletProvider(MNEMONIC, "https://ropsten.infura.io/YOUR_API_KEY")
+      provider: function() { 
+       return new HDWalletProvider({
+        privateKeys: [PRIVATE_KEYS.rinkeby],
+        providerOrUrl: INFURA_URLS.rinkeby,
+        numberOfAddresses: 1
+       })
       },
       network_id: 4,
-      gas: 4000000      //make sure this gas allocation isn't over 4M, which is the max
+      gas: 4000000, //4500000,
+      // gasPrice: 10000000000,
     }
   },
   //
