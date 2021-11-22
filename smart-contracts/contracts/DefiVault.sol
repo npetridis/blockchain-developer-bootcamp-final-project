@@ -6,14 +6,16 @@ pragma solidity 0.8.9;
 // import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol";
+import 'openzeppelin-solidity/contracts/security/ReentrancyGuard.sol';
+import "./CErc20.sol";
 
 import "./EtherWallet.sol";
 
-/// @title A smart contract wallet that stores ether and erc20 tokens
+/// @title A smart contract wallet that stores ether and erc20 tokens and supplies erc20 tokens to compound.finance
 /// @author Nikolaos Petridis
 /// @notice You can use this contract for only the most basic simulation
 /// @dev All function calls are currently implemented without side effects
-contract DefiVault is EtherWallet {
+contract DefiVault is EtherWallet, ReentrancyGuard {
   using SafeERC20 for IERC20;
 
   struct TokensLedger {
@@ -30,6 +32,8 @@ contract DefiVault is EtherWallet {
 
   event DepositERC20(address indexed sender, uint256 amount, address erc20Contract, uint256 newTotalBalance);
   event WithdrawERC20(address indexed to, uint256 amount, address erc20Contract, uint256 balance);
+  event SupplyERC20(address indexed owner, address underlyingErc20Contract, uint256 suppliedErc20Amount, address cErc20Contract, uint256 mintedCTokenAmount);
+  event RedeemERC20(address indexed owner, address cErc20Contract, uint256 suppliedCTokenAmount, address underlyingErc20Contract, uint256 redeemedErc20Amount);
 
   // Q: Does this need to be payable? Is there any reason to have it if I dont use it?
   fallback() external payable override {
@@ -69,7 +73,7 @@ contract DefiVault is EtherWallet {
   /// @notice Returns true when the sender has already registered the requested token address
   /// @param tokenAddress address of the ERC20 token contract
   /// @return True if the sender has registered the token, false otherwise
-  function hasRegisteredToken(address tokenAddress) internal view returns (bool) {
+  function hasRegisteredToken(address tokenAddress) private view returns (bool) {
     // if user has balance > 0 the token is already registered
     if (tokenBalances[msg.sender].balances[tokenAddress] > 0) {
       return true;
@@ -88,7 +92,7 @@ contract DefiVault is EtherWallet {
   /// @notice Updates users token ledger balance by registering it in the tokens list and adding the deposited amount
   /// @param tokenAddress address of the ERC20 token contract
   /// @param amount amount to be added to the token balance
-  function addTokenBalance(address tokenAddress, uint amount) internal {
+  function addTokenBalance(address tokenAddress, uint amount) private {
     if (!hasRegisteredToken(tokenAddress)) {
       tokenBalances[msg.sender].tokens.push(tokenAddress);
     }
@@ -101,7 +105,7 @@ contract DefiVault is EtherWallet {
   /// @param amount amount of ERC20 token to deposit
   /// @return The ERC20 token balance of the sender
   function depositToken(address tokenAddress, uint256 amount)
-    public
+    external
     returns (uint256)
   {
     IERC20 token = IERC20(tokenAddress);
@@ -120,10 +124,10 @@ contract DefiVault is EtherWallet {
   /// @param tokenAddress address of the ERC20 token contract
   /// @param amount amount of ERC20 token to withdraw
   /// @return The ERC20 token balance of the sender
-  function withdrawToken(address tokenAddress, uint256 amount)
-    public
-    returns (uint256)
-  {
+  function withdrawToken(
+    address tokenAddress,
+    uint256 amount
+  ) external nonReentrant returns (uint256) {
     uint256 tokenBalance = tokenBalances[msg.sender].balances[tokenAddress];
     require(amount <= tokenBalance, "Not enough token balance");
 
@@ -132,10 +136,67 @@ contract DefiVault is EtherWallet {
 
     IERC20 token = IERC20(tokenAddress);
     token.safeTransfer(msg.sender, amount);
-    // Q: Could the user provide a malicious contract address that has no tranfer function
-    // and that by executing his own code in fallback function could exploit this contract?
 
     emit WithdrawERC20(msg.sender, amount, tokenAddress, tokenBalances[msg.sender].balances[tokenAddress]);
     return tokenBalances[msg.sender].balances[tokenAddress];
+  }
+
+  function supplyErc20ToCompound(
+    address _erc20Contract,
+    address _cErc20Contract,
+    uint256 _numTokensToSupply
+  ) external returns (uint) {
+    // Create a reference to the underlying asset contract, like DAI.
+    IERC20 underlying = IERC20(_erc20Contract);
+
+    // Create a reference to the corresponding cToken contract, like cDAI
+    CErc20 cToken = CErc20(_cErc20Contract);
+
+    uint256 underlyingTokenBalance = tokenBalances[msg.sender].balances[_erc20Contract];
+    require(underlyingTokenBalance >= _numTokensToSupply, 'Not enough token erc20 token balance to supply');
+    tokenBalances[msg.sender].balances[_erc20Contract] -= _numTokensToSupply;
+
+    underlying.approve(_cErc20Contract, _numTokensToSupply);
+
+    uint256 cTokenBalanceBefore = cToken.balanceOf(address(this));
+    // Mint cTokens
+    uint mintResult = cToken.mint(_numTokensToSupply);
+    require(mintResult == 0, 'Minting failed');
+
+    uint256 cTokenBalanceAfter = cToken.balanceOf(address(this));
+    uint256 cTokenBalanceDiff = cTokenBalanceAfter - cTokenBalanceBefore;
+
+    addTokenBalance(_cErc20Contract, cTokenBalanceDiff);
+
+    emit SupplyERC20(msg.sender, _erc20Contract, _numTokensToSupply, _cErc20Contract, cTokenBalanceDiff);
+    return mintResult;
+  }
+
+  function redeemCErc20Tokens(
+    uint256 _cTokenAmount,
+    address _cErc20Contract
+  ) external nonReentrant returns (uint256) {
+    // Create a reference to the corresponding cToken contract, like cDAI
+    CErc20 cToken = CErc20(_cErc20Contract);
+
+    uint256 userCTokenBalance = tokenBalances[msg.sender].balances[_cErc20Contract];
+    require(_cTokenAmount <= userCTokenBalance, 'Not enough cToken balance');
+
+    address underlyingContract = cToken.underlying();
+    IERC20 underlying = IERC20(underlyingContract);
+
+    tokenBalances[msg.sender].balances[_cErc20Contract] -= _cTokenAmount;
+
+    uint256 erc20BalanceBefore = underlying.balanceOf(address(this));
+    uint256 redeemResult = cToken.redeem(_cTokenAmount);
+    require(redeemResult == 0, 'CToken Redemption failed');
+    uint256 erc20BalanceAfter = underlying.balanceOf(address(this));
+
+    uint256 erc20BalanceDiff = erc20BalanceAfter - erc20BalanceBefore;
+
+    addTokenBalance(underlyingContract, erc20BalanceDiff);
+
+    emit RedeemERC20(msg.sender, _cErc20Contract, _cTokenAmount, underlyingContract, erc20BalanceDiff);
+    return erc20BalanceDiff;
   }
 }
