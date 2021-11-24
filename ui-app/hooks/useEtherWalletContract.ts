@@ -38,13 +38,16 @@ export const useEtherWalletContract = (contractAddress: string | undefined): Use
         signer
       );
 
-
       if (!contract) return null;
-      const result = await contract.getEtherBalance();
-      console.log('result', typeof result, result);
+      try {
+        const result = await contract.getEtherBalance();
+        console.log('result', typeof result, result);
 
-      setEtherBalance(result);
-      return result;
+        setEtherBalance(result);
+        return result;
+      } catch (error) {
+
+      }
     },
     [provider, setEtherBalance, contractAddress]
   );
@@ -59,7 +62,7 @@ export const useEtherWalletContract = (contractAddress: string | undefined): Use
         return null;
       }
 
-      const signer = await getSigner()
+      const signer = await getSigner();
       if (!signer) {
         console.log('No signer');
         return null;

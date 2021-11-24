@@ -4,28 +4,30 @@ import { useWallet } from 'hooks';
 import { Card, Button as ButtonShared } from 'components/common';
 import { Button, Input, Stack, Box, FormLabel } from '@chakra-ui/react';
 
-type DepositTokenSectionProps = {
-  onDepositToken: (obj: any) => Promise<any>;
+type RedeemCTokenFromCompoundSectionProps = {
+  onRedeemCTokenFromCompound: (obj: RedeemCTokenFromCompoundFormProps) => Promise<any>;
   isLoading?: boolean;
 };
 
-export type DepositTokenFormProps = {
-  contractAddress: string;
+export type RedeemCTokenFromCompoundFormProps = {
+  cTokenAddress: string;
   amount: string;
 };
 
-export function DepositTokenSection({
-  onDepositToken,
+export function RedeemCTokenFromCompoundSection({
+  onRedeemCTokenFromCompound,
   isLoading,
-}: DepositTokenSectionProps): JSX.Element {
+}: RedeemCTokenFromCompoundSectionProps): JSX.Element {
   const { isConnected, connectWallet } = useWallet();
   const {
     register,
     handleSubmit,
     formState: { isSubmitting, errors, isDirty },
-  } = useForm<DepositTokenFormProps>({
+  } = useForm<RedeemCTokenFromCompoundFormProps>({
     mode: 'onChange',
   });
+
+  const isDisabled = !!errors.amount || !!errors.cTokenAddress || !isDirty;
 
   return (
     <Card
@@ -33,16 +35,16 @@ export function DepositTokenSection({
       as="form"
       id="deposit-token"
       border="1px solid rgb(44, 47, 54)"
-      onSubmit={handleSubmit(onDepositToken)}
+      onSubmit={handleSubmit(onRedeemCTokenFromCompound)}
     >
       <Stack spacing="1em">
         <Box>
-          <FormLabel htmlFor="contractAddress">ERC20 contract address:</FormLabel>
+          <FormLabel htmlFor="cTokenAddress">CToken contract address (token to redeem):</FormLabel>
           <Input
             type="text"
-            id="contractAddress"
+            id="cTokenAddress"
             placeholder="0x0000...0000"
-            {...register('contractAddress', {
+            {...register('cTokenAddress', {
               required: true,
               // validate: (value) =>
               //   utils.parseEther(value).gt(BigNumber.from(0)),
@@ -51,7 +53,7 @@ export function DepositTokenSection({
           />
         </Box>
         <Box>
-          <FormLabel htmlFor="amount">Deposit amount:</FormLabel>
+          <FormLabel htmlFor="amount">CToken amount to redeem:</FormLabel>
           <Input
             type="number"
             id="amount"
@@ -68,9 +70,9 @@ export function DepositTokenSection({
         {isConnected ? (
           <ButtonShared
             type="submit"
-            isDisabled={!!errors.amount || !!errors.contractAddress || !isDirty}
+            isDisabled={isDisabled}
           >
-            Deposit
+            Redeem
           </ButtonShared>
         ) : (
           <Button onClick={connectWallet}>Connect to wallet</Button>

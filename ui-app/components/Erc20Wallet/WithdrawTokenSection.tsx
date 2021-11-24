@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useWallet } from 'hooks';
-import { Card } from 'components/common';
+import { Card, Button as ButtonShared } from 'components/common';
 import { Button, Input, Stack, Box, FormLabel } from '@chakra-ui/react';
 import { BigNumber, utils } from 'ethers';
 
@@ -38,7 +38,7 @@ export function WithdrawTokenSection({
     >
       <Stack spacing="1em">
         <Box>
-          <FormLabel htmlFor="etherAmount">ERC20 contract address:</FormLabel>
+          <FormLabel htmlFor="contractAddress">ERC20 contract address:</FormLabel>
           <Input
             type="text"
             id="contractAddress"
@@ -50,7 +50,7 @@ export function WithdrawTokenSection({
           />
         </Box>
         <Box>
-          <FormLabel htmlFor="etherAmount">Withdraw amount:</FormLabel>
+          <FormLabel htmlFor="amount">Withdraw amount:</FormLabel>
           <Input
             type="number"
             id="amount"
@@ -65,15 +65,12 @@ export function WithdrawTokenSection({
           />
         </Box>
         {isConnected ? (
-          <Button
-            bg="background.light"
-            color="text.regular"
+          <ButtonShared
             type="submit"
-            _hover={{ color: 'text.active', bg: 'background.white' }}
             isDisabled={!!errors.amount || !!errors.contractAddress || !isDirty}
           >
             Withdraw
-          </Button>
+          </ButtonShared>
         ) : (
           <Button onClick={connectWallet}>Connect to wallet</Button>
         )}

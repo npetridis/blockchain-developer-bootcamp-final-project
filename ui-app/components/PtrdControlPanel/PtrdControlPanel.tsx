@@ -124,7 +124,7 @@ export function PtrdControlPanel(): JSX.Element {
           <Heading mb="4" fontSize="1em" color="background.white">
             ERC20 Operations
           </Heading>
-          <Accordion defaultIndex={[0]} allowMultiple>
+          <Accordion allowMultiple>
             <TotalSupply onClick={handleGetTotalSupply} />
             <BalanceOf onClick={handleGetBalanceOf} />
             <Transfer onClick={handleTransfer} />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEnvVars, useToast } from 'hooks';
 import { AddressCopy, Card } from 'components/common';
-import { Heading, Stack, Text } from '@chakra-ui/react';
+import { Heading, Stack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react';
 import { BigNumber } from 'ethers';
 import {
   DepositTokenSection,
@@ -11,11 +11,19 @@ import {
   WithdrawTokenSection,
   WithdrawTokenFormProps
 } from './WithdrawTokenSection';
+import {
+  SupplyTokenToCompoundSection,
+  SupplyTokenToCompoundFormProps
+} from './SupplyTokenToCompoundSection';
+import {
+  RedeemCTokenFromCompoundSection,
+  RedeemCTokenFromCompoundFormProps
+} from './RedeemCTokenFromCompoundSection';
 import { useDefiVaultContract } from 'hooks/useDefiVaultContract';
 
 export function Erc20Wallet(): JSX.Element {
   const { defiVaultContractAddress } = useEnvVars();
-  const { tokenBalances, depositToken, withdrawToken } =
+  const { tokenBalances, depositToken, withdrawToken, supplyTokenToCompound, redeemTokenFromCompound } =
     useDefiVaultContract(defiVaultContractAddress);
   const { successConfirmationToast, errorToast } = useToast();
 
@@ -34,7 +42,7 @@ export function Erc20Wallet(): JSX.Element {
     }
   };
 
-  const handleWithdrawEther = async ({
+  const handleWithdrawToken = async ({
     contractAddress,
     amount,
   }: WithdrawTokenFormProps) => {
@@ -44,6 +52,38 @@ export function Erc20Wallet(): JSX.Element {
         BigNumber.from(amount)
       );
       successConfirmationToast({ title: 'Withdrawal was successful!', txData });
+    } catch (error: any) {
+      errorToast({ error });
+    }
+  };
+
+  const handleSupplyToken = async ({
+    tokenAddress,
+    cTokenAddress,
+    amount,
+  }: SupplyTokenToCompoundFormProps) => {
+    try {
+      const txData = await supplyTokenToCompound(
+        tokenAddress,
+        cTokenAddress,
+        BigNumber.from(amount)
+      );
+      successConfirmationToast({ title: 'Token supply was successful!', txData });
+    } catch (error: any) {
+      errorToast({ error });
+    }
+  };
+
+  const handleRedeemCToken = async ({
+    cTokenAddress,
+    amount,
+  }: RedeemCTokenFromCompoundFormProps) => {
+    try {
+      const txData = await redeemTokenFromCompound(
+        BigNumber.from(amount),
+        cTokenAddress
+      );
+      successConfirmationToast({ title: 'CToken redemption was successful!', txData });
     } catch (error: any) {
       errorToast({ error });
     }
@@ -67,8 +107,28 @@ export function Erc20Wallet(): JSX.Element {
             <Text>The wallet is empty</Text>
           ) : null}
         </Card>
-        <DepositTokenSection onDepositToken={handleDepositToken} />
-        <WithdrawTokenSection onWithdrawToken={handleWithdrawEther} />
+
+        <Tabs variant="soft-rounded" colorScheme='orange' >
+          <TabList>
+            <Tab>Wallet</Tab>
+            <Tab>Invest with Compound</Tab>
+          </TabList>
+
+          <TabPanels>
+            <TabPanel>
+              <Stack spacing="1em">
+                <DepositTokenSection onDepositToken={handleDepositToken} />
+                <WithdrawTokenSection onWithdrawToken={handleWithdrawToken} />
+              </Stack>
+            </TabPanel>
+            <TabPanel>
+              <Stack spacing="1em">
+                <SupplyTokenToCompoundSection onSupplyTokenToCompound={handleSupplyToken} />
+                <RedeemCTokenFromCompoundSection onRedeemCTokenFromCompound={handleRedeemCToken} />
+              </Stack>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Stack>
     </Card>
   );

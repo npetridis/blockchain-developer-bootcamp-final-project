@@ -4,28 +4,31 @@ import { useWallet } from 'hooks';
 import { Card, Button as ButtonShared } from 'components/common';
 import { Button, Input, Stack, Box, FormLabel } from '@chakra-ui/react';
 
-type DepositTokenSectionProps = {
-  onDepositToken: (obj: any) => Promise<any>;
+type SupplyTokenToCompoundSectionProps = {
+  onSupplyTokenToCompound: (obj: SupplyTokenToCompoundFormProps) => Promise<any>;
   isLoading?: boolean;
 };
 
-export type DepositTokenFormProps = {
-  contractAddress: string;
+export type SupplyTokenToCompoundFormProps = {
+  tokenAddress: string;
+  cTokenAddress: string;
   amount: string;
 };
 
-export function DepositTokenSection({
-  onDepositToken,
+export function SupplyTokenToCompoundSection({
+  onSupplyTokenToCompound,
   isLoading,
-}: DepositTokenSectionProps): JSX.Element {
+}: SupplyTokenToCompoundSectionProps): JSX.Element {
   const { isConnected, connectWallet } = useWallet();
   const {
     register,
     handleSubmit,
     formState: { isSubmitting, errors, isDirty },
-  } = useForm<DepositTokenFormProps>({
+  } = useForm<SupplyTokenToCompoundFormProps>({
     mode: 'onChange',
   });
+
+  const isDisabled = !!errors.amount || !!errors.cTokenAddress || !!errors.tokenAddress || !isDirty;
 
   return (
     <Card
@@ -33,16 +36,16 @@ export function DepositTokenSection({
       as="form"
       id="deposit-token"
       border="1px solid rgb(44, 47, 54)"
-      onSubmit={handleSubmit(onDepositToken)}
+      onSubmit={handleSubmit(onSupplyTokenToCompound)}
     >
       <Stack spacing="1em">
         <Box>
-          <FormLabel htmlFor="contractAddress">ERC20 contract address:</FormLabel>
+          <FormLabel htmlFor="tokenAddress">ERC20 contract address to supply:</FormLabel>
           <Input
             type="text"
-            id="contractAddress"
+            id="tokenAddress"
             placeholder="0x0000...0000"
-            {...register('contractAddress', {
+            {...register('tokenAddress', {
               required: true,
               // validate: (value) =>
               //   utils.parseEther(value).gt(BigNumber.from(0)),
@@ -51,7 +54,21 @@ export function DepositTokenSection({
           />
         </Box>
         <Box>
-          <FormLabel htmlFor="amount">Deposit amount:</FormLabel>
+          <FormLabel htmlFor="cTokenAddress">CToken contract address (minted token):</FormLabel>
+          <Input
+            type="text"
+            id="cTokenAddress"
+            placeholder="0x0000...0000"
+            {...register('cTokenAddress', {
+              required: true,
+              // validate: (value) =>
+              //   utils.parseEther(value).gt(BigNumber.from(0)),
+            })}
+            disabled={!isConnected}
+          />
+        </Box>
+        <Box>
+          <FormLabel htmlFor="amount">ERC20 token amount to supply:</FormLabel>
           <Input
             type="number"
             id="amount"
@@ -68,9 +85,9 @@ export function DepositTokenSection({
         {isConnected ? (
           <ButtonShared
             type="submit"
-            isDisabled={!!errors.amount || !!errors.contractAddress || !isDirty}
+            isDisabled={isDisabled}
           >
-            Deposit
+            Supply
           </ButtonShared>
         ) : (
           <Button onClick={connectWallet}>Connect to wallet</Button>

@@ -25,9 +25,11 @@ type GetTokensResponse = {
 } | null;
 
 type UseDefiVaultContract = {
-  depositToken: (tokenAddress: string, etherAmount: BigNumber) => Promise<any>;
-  withdrawToken: (tokenAddress: string, etherAmount: BigNumber) => Promise<any>;
+  depositToken: (tokenAddress: string, tokenAmount: BigNumber) => Promise<any>;
+  withdrawToken: (tokenAddress: string, tokenAmount: BigNumber) => Promise<any>;
   getTokens: () => Promise<GetTokensResponse>;
+  supplyTokenToCompound: (tokenAddress: string, cTokenAddress: string, tokenAmount: BigNumber) => Promise<any>;
+  redeemTokenFromCompound: (cTokenAmount: BigNumber, cTokenAddress: string) => Promise<any>;
   tokenBalances: TokenBalance[] | undefined;
 };
 
@@ -50,8 +52,6 @@ export const useDefiVaultContract = (contractAddress: string | undefined): UseDe
         return null;
       }
 
-      console.log('TEST')
-
       const contract = new ethers.Contract(
         contractAddress,
         defiVaultAbiJson.abi,
@@ -67,15 +67,19 @@ export const useDefiVaultContract = (contractAddress: string | undefined): UseDe
 
   const updateAllTokensBalance = React.useCallback(
     async () => {
-      const result = await getTokens();
-      if (!result) return;
-      const mergedResult: TokenBalance[] = await Promise.all(result.tokens.map(async (address, index) => ({
-        address,
-        balance: result.balances[index],
-        ...(await getErc20Info(address) || {})
-      })));
+      try {
+        const result = await getTokens();
+        if (!result) return;
+        const mergedResult: TokenBalance[] = await Promise.all(result.tokens.map(async (address, index) => ({
+          address,
+          balance: result.balances[index],
+          ...(await getErc20Info(address) || {})
+        })));
 
-      setTokenBalances(mergedResult);
+        setTokenBalances(mergedResult);
+      } catch (error) {
+
+      }
     },
     [provider, contractAddress, getTokens]
   );
@@ -157,12 +161,79 @@ export const useDefiVaultContract = (contractAddress: string | undefined): UseDe
       );
 
       if (!contract) return null;
-      const tx = await contract.depositToken(tokenAddress, amount.toString());
+
+      console.log('BBB', tokenAddress, amount.toString())
+
+      try {
+        const tx = await contract.depositToken(tokenAddress, amount.toString());
+        successTransactionToast({ txHash: tx.hash });
+        const txData = await tx.wait();
+
+        updateAllTokensBalance();
+        return txData;
+      } catch (error) {
+        console.log('pame re paidiaa!', error);
+
+      }
+    },
+    [provider, contractAddress, updateAllTokensBalance]
+  );
+
+  const supplyTokenToCompound = React.useCallback(
+    async (erc20ContractAddress: string, cErc20ContractAddress: string, amount: BigNumber): Promise<any> => {
+      if (!provider || !contractAddress) {
+        return null;
+      }
+
+      const signer = await getSigner();
+      if (!signer) {
+        console.log('No signer');
+        return null;
+      }
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        defiVaultAbiJson.abi,
+        signer
+      );
+
+      if (!contract) return null;
+      try {
+        const tx = await contract.supplyErc20ToCompound(erc20ContractAddress, cErc20ContractAddress, amount.toString());
+        successTransactionToast({ txHash: tx.hash });
+        const txData = await tx.wait();
+        updateAllTokensBalance();
+        return txData;
+      } catch (error) {
+        console.log('pame re paidiaa', error);
+      }
+
+    },
+    [provider, contractAddress, updateAllTokensBalance]
+  );
+
+  const redeemTokenFromCompound = React.useCallback(
+    async (cTokenAmount: BigNumber, cErc20ContractAddress: string): Promise<any> => {
+      if (!provider || !contractAddress) {
+        return null;
+      }
+
+      const signer = await getSigner();
+      if (!signer) {
+        console.log('No signer');
+        return null;
+      }
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        defiVaultAbiJson.abi,
+        signer
+      );
+
+      if (!contract) return null;
+      const tx = await contract.redeemCErc20Tokens(cTokenAmount.toString(), cErc20ContractAddress);
       successTransactionToast({ txHash: tx.hash });
       const txData = await tx.wait();
-
-      const depositErc20event = txData.events.find((e: any) => e?.event === Events.DepositErc20);
-      // const newBalance = depositErc20event.args[3] as BigNumber;
 
       updateAllTokensBalance();
       return txData;
@@ -174,6 +245,8 @@ export const useDefiVaultContract = (contractAddress: string | undefined): UseDe
     depositToken,
     withdrawToken,
     getTokens,
+    supplyTokenToCompound,
+    redeemTokenFromCompound,
     tokenBalances
   };
 };

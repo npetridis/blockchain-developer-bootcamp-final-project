@@ -47,14 +47,18 @@ export const useErc20Token = (
       erc20AbiJson.abi,
       provider
     );
+    if (!erc20Contract) return;
     setContract(erc20Contract);
 
     const getTokenData = async () => {
-      const name = await erc20Contract.name();
-      const symbol = await erc20Contract.symbol();
-      const totalSupply = await erc20Contract.totalSupply();
+      try {
+        const name = await erc20Contract.name();
+        const symbol = await erc20Contract.symbol();
+        const totalSupply = await erc20Contract.totalSupply();
+        setTokenData({ name, symbol, totalSupply: totalSupply });
+      } catch (error) {
 
-      setTokenData({ name, symbol, totalSupply: totalSupply });
+      }
     };
     getTokenData();
   }, [provider, contractAddress]);

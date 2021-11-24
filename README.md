@@ -52,3 +52,32 @@ require(balances[msg.sender] >= amount);
 balances[msg.sender] -= amount;
 msg.sender.call.value(amount)("");
 }
+
+### Contract links on ropsten
+
+Compound (COMP)
+0xf76D4a441E4ba86A923ce32B89AFF89dBccAA075
+https://ropsten.etherscan.io/token/0xf76D4a441E4ba86A923ce32B89AFF89dBccAA075#readContract
+
+Compound COMP (cCOMP)
+0x70014768996439f71c041179ffddce973a83eef2
+https://ropsten.etherscan.io/token/0x70014768996439f71c041179ffddce973a83eef2
+
+To get COMP:
+  * get ropsten ETH from (faucet link)
+  * go to https://app.uniswap.org/#/swap add COMP(0xf76D4a441E4ba86A923ce32B89AFF89dBccAA075) as exchange token
+  * exchange ETH with the imported COMP
+
+Tether USD (USDT)
+0x110a13fc3efe6a245b50102d2d79b3e76125ae83
+https://ropsten.etherscan.io/token/0x110a13fc3efe6a245b50102d2d79b3e76125ae83#readContract
+
+Compound USDT (cUSDT)
+0xf6958cf3127e62d3eb26c79f4f45d3f3b2ccded4
+https://ropsten.etherscan.io/token/0xf6958cf3127e62d3eb26c79f4f45d3f3b2ccded4
+
+
+The most likely reason for this error is that you are using "string" data type for URIs, and so the compiler naturally cannot estimate the gas usage when calling the mint function as the uri parameter's length can be arbitrary. Solidity documentation recommends the following:
+
+As a general rule, use bytes for arbitrary-length raw byte data and string for arbitrary-length string (UTF-8) data. If you can limit the length to a certain number of bytes, always use one of the value types bytes1 to bytes32 because they are much cheaper.
+

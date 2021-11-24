@@ -44,6 +44,10 @@ export const useWallet = () => {
     }
     try {
       const signer = provider.getSigner();
+      if (!signer) {
+        return;
+      }
+
       setSignerAddress(await signer.getAddress());
       setEthBalance(await signer.getBalance());
     } catch (error: any) {

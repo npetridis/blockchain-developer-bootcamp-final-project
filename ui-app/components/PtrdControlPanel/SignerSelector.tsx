@@ -30,8 +30,12 @@ export function SignerSelector({
     if (!metamaskSigner) {
       return;
     }
-    const signerAddress = await metamaskSigner.getAddress();
-    setMetamaskAddress(signerAddress);
+    try {
+      const signerAddress = await metamaskSigner.getAddress();
+      setMetamaskAddress(signerAddress);
+    } catch (error) {
+      
+    }
   };
 
   React.useEffect(() => {
@@ -48,8 +52,12 @@ export function SignerSelector({
     if (!ptrdSigner) return;
 
     const updatePtrdAddress = async function () {
-      const signerAddress = await ptrdSigner.getAddress();
-      setPtrdDeployerAddress(signerAddress);
+      try {
+        const signerAddress = await ptrdSigner.getAddress();
+        setPtrdDeployerAddress(signerAddress);
+      } catch (error) {
+
+      }
     };
 
     updatePtrdAddress();
