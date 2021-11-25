@@ -50,10 +50,13 @@ contract EtherWallet {
   /// @return The new ether balance of the sender
   function withdrawEther(uint256 amount) external returns (uint256) {
     require(amount <= etherBalances[msg.sender], "Not enough ether balance");
+    
     etherBalances[msg.sender] -= amount;
     (bool success, ) = msg.sender.call{value: amount}("");
     require(success, "Failed to withdraw Ether"); // Q: is assert a better match?
+    
     emit WithdrawEther(msg.sender, amount, etherBalances[msg.sender]);
+    
     return etherBalances[msg.sender];
   }
 }

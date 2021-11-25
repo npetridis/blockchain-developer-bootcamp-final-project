@@ -1,5 +1,3 @@
-// const ConvertLib = artifacts.require("ConvertLib");
-// const MetaCoin = artifacts.require("MetaCoin");
 const Petrideum = artifacts.require("Petrideum");
 const DefiVault = artifacts.require("DefiVault");
 

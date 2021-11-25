@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "truffle test",
     "predeploy": "rm -rf ./build",
     "predeploy:ropsten": "rm -rf ./build",
     "deploy": "truffle compile;truffle migrate --network development",
@@ -22,5 +22,11 @@
     "@truffle/hdwallet-provider": "^1.6.0",
     "dotenv": "^10.0.0",
     "openzeppelin-solidity": "4.3.2"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/test-helpers": "^0.5.15",
+    "chance": "^1.1.8",
+    "web3": "^1.6.1"
   }
 }

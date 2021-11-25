@@ -31,7 +31,7 @@ contract DefiVault is EtherWallet, ReentrancyGuard {
   mapping(address => TokensLedger) private tokenBalances; // user address => user wallet
 
   event DepositERC20(address indexed sender, uint256 amount, address erc20Contract, uint256 newTotalBalance);
-  event WithdrawERC20(address indexed to, uint256 amount, address erc20Contract, uint256 balance);
+  event WithdrawERC20(address indexed to, uint256 amount, address erc20Contract, uint256 newTotalBalance);
   event SupplyERC20(address indexed owner, address underlyingErc20Contract, uint256 suppliedErc20Amount, address cErc20Contract, uint256 mintedCTokenAmount);
   event RedeemERC20(address indexed owner, address cErc20Contract, uint256 suppliedCTokenAmount, address underlyingErc20Contract, uint256 redeemedErc20Amount);
 
