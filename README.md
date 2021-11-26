@@ -1,57 +1,83 @@
-# Blockchain developer bootcamp final project
+# DefiVault - Defi wallet and funds investor 
 
-## Idea 1: Decentralized User Authentication
 
-### We have two roles:
+<img src="./ui-app/public/defivault.svg" alt="drawing"  />
 
-- <b>Business Owner</b>: the user that will interact with the smart contract through the web3 website and add a whitelist of public addresses that can access his website or services.
-- <b>Client</b>: the client that the Business owner has given a private key so that he can sign in to his business website by signing in through the smart contract.
+<p>A smart contract wallet that stores ether and any Erc20 token and can invest in Compound.finance protocol any supported Erc20 token</p>
 
-### Happy path
+The contract is deployed and verified on the Ropsten testnet at  
+`TODO add address`
 
-1. The Business Owner creates offline (private key, public address) pairs for his clients and distributes to them each private key
-2. The Business Owner creates account through the smart contract UI.
-3. The Business Owner registers the whitelisted public addresses to his account.  
-   These public addresses will have access to his services through our smart contract (verify with their private keys).
-4. A Client will finally visit the Business Owner's website and sign in with his metamask by interacting with the smart contract.  
-   His metamask will be seeded with the private key the Business Owner gave him in the first step.
+### Smart contracts
+The Smart contracts implement functionality to 
+* deposit ether in the DefiVault smart contract
+* get the ether balance
+* withdraw ether
+* deposit any ERC20 token in the DefiVault smart contract
+* get all the balances of the deposited ERC20 tokens
+* withdraw ERC20 tokens
+* supply compatible ERC20 tokens to Compound.finance in order to acquire interest
+* redeem ERC20 tokens supplied to Compound.finance along with interest (for short term we could notice that we redeemed less than we supplied due to the fees)
 
-### UI Components
+### UI client
+A Next.js app that uses ethers.js wrapped in custom hooks to interact with the blockchain
+The app has three basic sections (tabs)
+* Ether: exposes functionality to interact with ether (deposit, withdraw)
+* ERC20: exposes functionality to interact with ERC20 tokens (deposit,  withdraw, supply to Compound, redeem from compound)
+* PTRD: this is a control panel for a custom deployed ERC20 token that can do all the basic ERC20 token interactions and most importantly transfer tokens to any user and approve tokens towards the DefiVault contract so that we can use its deposit tokens functionality
 
-- Web3 UI where the Business Owner will interact with the smart contract and register his whitelisted public addresses.
-- The Business Owner's website that will have a web3 snippet that will allow it's users to sign in by interacting with the smart contract.
 
-## Idea 2: Wallet that stores ERC20 tokens and invests them on compound.finance
+## How to interact with DefiVault
 
-### Description
+There are two ways to use DefiVault, both of them require metamask browser plugin to be installed.
+### 1. Interact through UI client deployed publicly in Vercel
 
-- The user will be able to view, deposit and withdraw funds (ether and ERC20 tokens)
-- The user will be able, through a UI toggle, to invest the selected funds through compound.finance
+* Go to <a href='https://defivault.vercel.app/'>https://defivault.vercel.app</a>
+* Connect with metamask on Ropsten network
+* Get ether from <a href='https://faucet.ropsten.be/'>ropsten faucet</a> to use ether wallet functionality (deposit and withdraw ether)
+* Use PTRD control panel to transfer custom deployed ERC20 token to your wallet and interact with ERC20 wallet functionality (depositToken, withdrawToken)
 
-### TODO
+### 2. Setup the project locally
+<ul>
+  <li>Clone locally this repository and open a terminal in the top level directory</li>
+  <li>Install truffle and ganache-cli</li>
 
-- Make contract Pausable to be prepared for bugs, Circui breaker design pattern
-- Manage the amount of money at risk with `rate limiting` or `caps` and setup an effective upgrade path for bug fixes and improvements
-- Do not to use send and transfer, and instead use call.value
-- Use withdrawal pattern and push-pull
-- To avoid front-running use commit - reveal pattern
-- Reentrancy (change the balance and then send the money) check 3 word rule on relative section
-- Reentrancy vs push pull withdrawal pattern
+    npm install -g truffle
+    npm install -g ganache-cli
+   <li>Open a new terminal window and run</li>
 
-Checks-Effects-Interactions
-Avoid state changes after external calls, to avoid things like the DAO hack:
+     ganache-cli
+   <li>Install smart contract dependencies and deploy contracts to local ganache-cli</li>
 
-function withdraw(uint amount) public { // Possibly dangerous
-require(balances[msg.sender] >= amount);
-msg.sender.call.value(amount)("");
-balances[msg.sender] -= amount;
-}
+      npm install
+      npm run deploy
+   <li>Create .env file in ui-app and add the required fields</li>
 
-function withdraw(uint amount) public { // Better!
-require(balances[msg.sender] >= amount);
-balances[msg.sender] -= amount;
-msg.sender.call.value(amount)("");
-}
+    cd ../ui-app
+    touch .env
+  Using the `.env.example` file as a guide to fill in the .env with the required fields
+  To make it work for local ganache-cli network we need the contract addresses of `DefiVault` and `Petridereum` and the private key of the first ganache-cli address (This account is the owner of Petridereum and can transfer us tokens to test the app)
+   
+  <li>Install UI client dependencies and start the server locally</li>
+
+    yarn dev
+</ul>
+
+
+## Smart contract unit tests
+
+To run the unit tests start `ganache-cli` in a terminal and then in a new window run:
+
+    truffle test
+or
+
+    npm run test
+
+
+## Ethereum account (for NFT certification)
+```
+TODO: add address
+```
 
 ### Contract links on ropsten
 

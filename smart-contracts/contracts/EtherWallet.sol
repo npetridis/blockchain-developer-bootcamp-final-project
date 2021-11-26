@@ -2,20 +2,18 @@
 
 pragma solidity 0.8.9;
 
-// Q: If I add Pausable functionality where should I declare it
-// make all functions virtual and override them with relative modifier on parent contract?
+import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 
-/// @title An ether wallet that stores ether and erc20 tokens
+/// @title Ether management Wallet contract
 /// @author Nikolaos Petridis
-/// @notice You can use this contract for only the most basic simulation
-/// @dev All function calls are currently implemented without side effects
-contract EtherWallet {
+/// @notice deposit and witdraw ether in a smart contract
+contract EtherWallet is ReentrancyGuard {
   mapping(address => uint256) private etherBalances; // user address => ether amount
 
   event DepositEther(address indexed sender, uint256 amount, uint256 balance);
   event WithdrawEther(address indexed to, uint256 amount, uint256 balance);
 
-  // not necessary
+  /// @notice Deposit ether to wallet
   receive() external payable virtual {
     if (msg.value > 0) {
       // Q: Does this uses SafeMath by default? 
@@ -24,7 +22,8 @@ contract EtherWallet {
     }
   }
 
-  // Q: Does this need to be payable? Is there any reason to have it if I dont use it?
+  /// @notice fallback always reverts because if ether is
+  /// @notice sent by accident it cannot be withdrawn
   fallback() external payable virtual {
     revert();
   }
@@ -48,12 +47,12 @@ contract EtherWallet {
   /// @notice Withdraw ether from wallet to sender address
   /// @param amount ether amount you want to withdraw
   /// @return The new ether balance of the sender
-  function withdrawEther(uint256 amount) external returns (uint256) {
+  function withdrawEther(uint256 amount) external nonReentrant returns (uint256) {
     require(amount <= etherBalances[msg.sender], "Not enough ether balance");
     
     etherBalances[msg.sender] -= amount;
     (bool success, ) = msg.sender.call{value: amount}("");
-    require(success, "Failed to withdraw Ether"); // Q: is assert a better match?
+    require(success, "Failed to withdraw Ether");
     
     emit WithdrawEther(msg.sender, amount, etherBalances[msg.sender]);
     

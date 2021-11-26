@@ -2,21 +2,20 @@
 
 pragma solidity 0.8.9;
 
-// import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-// import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol";
-import 'openzeppelin-solidity/contracts/security/ReentrancyGuard.sol';
+import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
+import '@openzeppelin/contracts/utils/Address.sol';
+import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import "./CErc20.sol";
-
 import "./EtherWallet.sol";
 
 /// @title A smart contract wallet that stores ether and erc20 tokens and supplies erc20 tokens to compound.finance
 /// @author Nikolaos Petridis
 /// @notice You can use this contract for only the most basic simulation
 /// @dev All function calls are currently implemented without side effects
-contract DefiVault is EtherWallet, ReentrancyGuard {
-  using SafeERC20 for IERC20;
+contract DefiVault is ReentrancyGuard, EtherWallet {
+  using SafeERC20 for ERC20;
+  using Address for address;
 
   struct TokensLedger {
     address[] tokens;
@@ -108,7 +107,11 @@ contract DefiVault is EtherWallet, ReentrancyGuard {
     external
     returns (uint256)
   {
-    IERC20 token = IERC20(tokenAddress);
+    require(
+      tokenAddress.isContract() && tokenAddress != address(0),
+      'Not a valid contract address'
+    );
+    ERC20 token = ERC20(tokenAddress);
 
     uint256 allowance = token.allowance(msg.sender, address(this));
     require(allowance >= amount, 'Not enough token allowance to complete the deposit');
@@ -128,13 +131,18 @@ contract DefiVault is EtherWallet, ReentrancyGuard {
     address tokenAddress,
     uint256 amount
   ) external nonReentrant returns (uint256) {
+    require(
+      tokenAddress.isContract() && tokenAddress != address(0),
+      'Not a valid contract address'
+    );
+
     uint256 tokenBalance = tokenBalances[msg.sender].balances[tokenAddress];
     require(amount <= tokenBalance, "Not enough token balance");
 
     // Avoids reentancy SWC-107, Q: is it enough or I need a reentrancy guard modifier?
     tokenBalances[msg.sender].balances[tokenAddress] -= amount;
 
-    IERC20 token = IERC20(tokenAddress);
+    ERC20 token = ERC20(tokenAddress);
     token.safeTransfer(msg.sender, amount);
 
     emit WithdrawERC20(msg.sender, amount, tokenAddress, tokenBalances[msg.sender].balances[tokenAddress]);
@@ -146,14 +154,22 @@ contract DefiVault is EtherWallet, ReentrancyGuard {
     address _cErc20Contract,
     uint256 _numTokensToSupply
   ) external returns (uint) {
+    require(
+      _erc20Contract.isContract() && _erc20Contract != address(0),
+      'Not a valid contract address (_erc20Contract)'
+    );
+    require(
+      _cErc20Contract.isContract() && _cErc20Contract != address(0),
+      'Not a valid contract address (_cErc20Contract)'
+    );
     // Create a reference to the underlying asset contract, like DAI.
-    IERC20 underlying = IERC20(_erc20Contract);
+    ERC20 underlying = ERC20(_erc20Contract);
 
     // Create a reference to the corresponding cToken contract, like cDAI
     CErc20 cToken = CErc20(_cErc20Contract);
 
     uint256 underlyingTokenBalance = tokenBalances[msg.sender].balances[_erc20Contract];
-    require(underlyingTokenBalance >= _numTokensToSupply, 'Not enough token erc20 token balance to supply');
+    require(underlyingTokenBalance >= _numTokensToSupply, 'Not enough erc20 token balance to supply');
     tokenBalances[msg.sender].balances[_erc20Contract] -= _numTokensToSupply;
 
     underlying.approve(_cErc20Contract, _numTokensToSupply);
@@ -176,6 +192,11 @@ contract DefiVault is EtherWallet, ReentrancyGuard {
     uint256 _cTokenAmount,
     address _cErc20Contract
   ) external nonReentrant returns (uint256) {
+    require(
+      _cErc20Contract.isContract() && _cErc20Contract != address(0),
+      'Not a valid contract address'
+    );
+    
     // Create a reference to the corresponding cToken contract, like cDAI
     CErc20 cToken = CErc20(_cErc20Contract);
 
@@ -183,7 +204,7 @@ contract DefiVault is EtherWallet, ReentrancyGuard {
     require(_cTokenAmount <= userCTokenBalance, 'Not enough cToken balance');
 
     address underlyingContract = cToken.underlying();
-    IERC20 underlying = IERC20(underlyingContract);
+    ERC20 underlying = ERC20(underlyingContract);
 
     tokenBalances[msg.sender].balances[_cErc20Contract] -= _cTokenAmount;
 
