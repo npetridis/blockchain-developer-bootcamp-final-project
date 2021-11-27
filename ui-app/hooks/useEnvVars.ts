@@ -16,14 +16,22 @@ type EnvVars = {
   defiVaultContractAddress: string | undefined;
   petrideumErc20ContractAddress: string | undefined;
   petrideumOwnerPrivateKey: string | undefined;
+  activeNetwork: string;
 }
 
 export function useEnvVars(): EnvVars {
   const [activeNetwork, setActiveNetwork] = React.useState('N/A');
   React.useEffect(() => {
+    if (!window.ethereum) {
+      return;
+    }
     const chainId = window.ethereum.networkVersion;
     setActiveNetwork(chainId);
-    window.ethereum.on('chainChanged', (_chainId: string) => window.location.reload());
+
+    const onChainChangedListener = (_chainId: string) => window.location.reload();
+
+    window.ethereum.on('chainChanged', onChainChangedListener);
+    return () => window.ethereum.removeListener('chainChanged', onChainChangedListener);
   }, []);
 
   switch (activeNetwork) {
@@ -31,7 +39,8 @@ export function useEnvVars(): EnvVars {
       return {
         defiVaultContractAddress: process.env.NEXT_PUBLIC_DEFI_VAULT_CONTRACT_ADDRESS_GANACHE,
         petrideumErc20ContractAddress: process.env.NEXT_PUBLIC_PETRIDEUM_ERC20_CONTRACT_ADDRESS_GANACHE,
-        petrideumOwnerPrivateKey: process.env.NEXT_PUBLIC_PETRIDEUM_OWNER_PRIVATE_KEY_GANACHE
+        petrideumOwnerPrivateKey: process.env.NEXT_PUBLIC_PETRIDEUM_OWNER_PRIVATE_KEY_GANACHE,
+        activeNetwork
       }
     case Networks.Mainnet:
     case Networks.Rinkeby:
@@ -44,7 +53,8 @@ export function useEnvVars(): EnvVars {
       return {
         defiVaultContractAddress: process.env.NEXT_PUBLIC_DEFI_VAULT_CONTRACT_ADDRESS_ROPSTEN,
         petrideumErc20ContractAddress: process.env.NEXT_PUBLIC_PETRIDEUM_ERC20_CONTRACT_ADDRESS_ROPSTEN,
-        petrideumOwnerPrivateKey: process.env.NEXT_PUBLIC_PETRIDEUM_OWNER_PRIVATE_KEY_ROPSTEN
+        petrideumOwnerPrivateKey: process.env.NEXT_PUBLIC_PETRIDEUM_OWNER_PRIVATE_KEY_ROPSTEN,
+        activeNetwork
       }
   }
 }

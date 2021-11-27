@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, ButtonProps, HStack, Text } from '@chakra-ui/react';
+import { HStack, Tag } from '@chakra-ui/react';
 import { BigNumber, utils } from 'ethers';
 import { formatAddress } from 'utils';
 
@@ -16,17 +16,16 @@ export function WalletInfo({ balance, address }: WalletInfoProps) {
   if (!address) {
     return null;
   }
+
   return (
     <HStack
       width="max-content"
       spacing="0.5em"
-      background="background.light"
       justifySelf="end"
+      zIndex="2"
     >
-      <Text>{formatEtherBalance(balance)} ETH</Text>
-      <Box>
-        <Text>{formatAddress(address)}</Text>
-      </Box>
+      <Tag size='lg' color="text.regular" bg='background.light'>{formatEtherBalance(balance)} ETH</Tag>
+      <Tag size='lg' color="text.regular" bg='background.dark'>{formatAddress(address, 8)}</Tag>
     </HStack>
   );
 }

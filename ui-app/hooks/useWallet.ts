@@ -38,6 +38,23 @@ export const useWallet = () => {
     // TODO: switch with provider.on and add cleanup
   }, [provider]);
 
+  React.useEffect(() => {
+    if (!provider) {
+      return;
+    }
+
+    const blockListener = (blockNumber: number) => {
+      // Emitted on every block change
+      // setBlockNumber(blockNumber)
+      updateSigner();
+    }
+
+    provider.on("block", blockListener);
+
+    return () => void provider.removeListener('block', blockListener);
+
+  }, []);
+
   const updateSigner = async () => {
     if (!provider) {
       return;
