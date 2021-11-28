@@ -134,7 +134,6 @@ export const useDefiVaultContract = (contractAddress: string | undefined): UseDe
       const txData = await tx.wait();
 
       const withdrawErc20event = txData.events.find((e: any) => e?.event === Events.WithdrawErc20);
-      const newBalance = withdrawErc20event.args[3] as BigNumber;
 
       updateAllTokensBalance()
       return txData;
@@ -162,19 +161,12 @@ export const useDefiVaultContract = (contractAddress: string | undefined): UseDe
 
       if (!contract) return null;
 
-      console.log('BBB', tokenAddress, amount.toString())
+      const tx = await contract.depositToken(tokenAddress, amount.toString());
+      successTransactionToast({ txHash: tx.hash });
+      const txData = await tx.wait();
 
-      try {
-        const tx = await contract.depositToken(tokenAddress, amount.toString());
-        successTransactionToast({ txHash: tx.hash });
-        const txData = await tx.wait();
-
-        updateAllTokensBalance();
-        return txData;
-      } catch (error) {
-        console.log('pame re paidiaa!', error);
-
-      }
+      updateAllTokensBalance();
+      return txData;
     },
     [provider, contractAddress, updateAllTokensBalance]
   );
@@ -198,16 +190,11 @@ export const useDefiVaultContract = (contractAddress: string | undefined): UseDe
       );
 
       if (!contract) return null;
-      try {
-        const tx = await contract.supplyErc20ToCompound(erc20ContractAddress, cErc20ContractAddress, amount.toString());
-        successTransactionToast({ txHash: tx.hash });
-        const txData = await tx.wait();
-        updateAllTokensBalance();
-        return txData;
-      } catch (error) {
-        console.log('pame re paidiaa', error);
-      }
-
+      const tx = await contract.supplyErc20ToCompound(erc20ContractAddress, cErc20ContractAddress, amount.toString());
+      successTransactionToast({ txHash: tx.hash });
+      const txData = await tx.wait();
+      updateAllTokensBalance();
+      return txData;
     },
     [provider, contractAddress, updateAllTokensBalance]
   );
