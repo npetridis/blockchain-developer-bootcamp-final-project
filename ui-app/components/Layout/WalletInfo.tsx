@@ -24,7 +24,7 @@ export function WalletInfo({ balance, address }: WalletInfoProps) {
       justifySelf="end"
       zIndex="2"
     >
-      <Tag size='lg' color="text.regular" bg='background.light'>{formatEtherBalance(balance)} ETH</Tag>
+      {/* <Tag size='lg' color="text.regular" bg='background.light'>{formatEtherBalance(balance)} ETH</Tag> */}
       <Tag size='lg' color="text.regular" bg='background.dark'>{formatAddress(address, 8)}</Tag>
     </HStack>
   );
