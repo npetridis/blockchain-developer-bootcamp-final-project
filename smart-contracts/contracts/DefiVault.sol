@@ -27,20 +27,16 @@ contract DefiVault is ReentrancyGuard, EtherWallet {
     mapping(address => uint256) balances;
   }
 
-  mapping(address => TokensLedger) private tokenBalances; // user address => user wallet
+  // user address => user wallet
+  mapping(address => TokensLedger) private tokenBalances;
 
   event DepositERC20(address indexed sender, uint256 amount, address erc20Contract, uint256 newTotalBalance);
   event WithdrawERC20(address indexed to, uint256 amount, address erc20Contract, uint256 newTotalBalance);
   event SupplyERC20(address indexed owner, address underlyingErc20Contract, uint256 suppliedErc20Amount, address cErc20Contract, uint256 mintedCTokenAmount);
   event RedeemERC20(address indexed owner, address cErc20Contract, uint256 suppliedCTokenAmount, address underlyingErc20Contract, uint256 redeemedErc20Amount);
 
-  // Q: Does this need to be payable? Is there any reason to have it if I dont use it?
   fallback() external payable override {
     revert();
-    // if (msg.value > 0) {
-    //   etherBalances[msg.sender] += msg.value;
-    //   emit Deposit(msg.sender, msg.value, etherBalances[msg.sender]);
-    // }
   }
 
   /// @notice Get the ERC20 token balance of the sender
@@ -95,7 +91,6 @@ contract DefiVault is ReentrancyGuard, EtherWallet {
     if (!hasRegisteredToken(tokenAddress)) {
       tokenBalances[msg.sender].tokens.push(tokenAddress);
     }
-    // Q: Is the += statement with safe math?
     tokenBalances[msg.sender].balances[tokenAddress] += amount;
   }
 
@@ -139,7 +134,6 @@ contract DefiVault is ReentrancyGuard, EtherWallet {
     uint256 tokenBalance = tokenBalances[msg.sender].balances[tokenAddress];
     require(amount <= tokenBalance, "Not enough token balance");
 
-    // Avoids reentancy SWC-107, Q: is it enough or I need a reentrancy guard modifier?
     tokenBalances[msg.sender].balances[tokenAddress] -= amount;
 
     ERC20 token = ERC20(tokenAddress);
@@ -197,7 +191,7 @@ contract DefiVault is ReentrancyGuard, EtherWallet {
       'Not a valid contract address'
     );
     
-    // Create a reference to the corresponding cToken contract, like cDAI
+    // Create a reference to the corresponding cToken contract
     CErc20 cToken = CErc20(_cErc20Contract);
 
     uint256 userCTokenBalance = tokenBalances[msg.sender].balances[_cErc20Contract];
