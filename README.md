@@ -5,7 +5,7 @@
 
 <p>A smart contract wallet that stores ether and any Erc20 token and can invest in Compound.finance protocol any supported Erc20 token</p>
 
-The contract is deployed and verified on the Ropsten testnet at  
+The contract is deployed and verified(??) on the Ropsten testnet at  
 `TODO add address`
 
 ### Smart contracts
@@ -17,14 +17,14 @@ The Smart contracts implement functionality to
 * get all the balances of the deposited ERC20 tokens
 * withdraw ERC20 tokens
 * supply compatible ERC20 tokens to Compound.finance in order to acquire interest
-* redeem ERC20 tokens supplied to Compound.finance along with interest (for short term we could notice that we redeemed less than we supplied due to the fees)
+* redeem ERC20 tokens supplied to Compound.finance along with interest (for short term supply period we could notice that we redeemed less than we supplied due to the fees)
 
 ### UI client
-A Next.js app that uses ethers.js wrapped in custom hooks to interact with the blockchain
-The app has three basic sections (tabs)
+A Next.js app that uses ethers.js wrapped in custom hooks to interact with the blockchain  
+The app integrates with all the smart contract functionalities through the three following sections that correspond to the UI tabs:
 * Ether: exposes functionality to interact with ether (deposit, withdraw)
 * ERC20: exposes functionality to interact with ERC20 tokens (deposit,  withdraw, supply to Compound, redeem from compound)
-* PTRD: this is a control panel for a custom deployed ERC20 token that can do all the basic ERC20 token interactions and most importantly transfer tokens to any user and approve tokens towards the DefiVault contract so that we can use its deposit tokens functionality
+* PTRD: this is a control panel for a custom deployed ERC20 token that can do all the basic ERC20 token interactions and most importantly transfer tokens to any user and approve tokens towards the DefiVault contract so that we can use its <i>deposit tokens</i> functionality
 
 
 ## How to interact with DefiVault
@@ -36,8 +36,10 @@ There are two ways to use DefiVault, both of them require metamask browser plugi
 * Connect with metamask on Ropsten network
 * Get ether from <a href='https://faucet.ropsten.be/'>ropsten faucet</a> to use ether wallet functionality (deposit and withdraw ether)
 * Use PTRD control panel to transfer custom deployed ERC20 token to your wallet and interact with ERC20 wallet functionality (depositToken, withdrawToken)
+* Exchange ether with other Compound protocol compatible tokens in uniswap in order to deposit them in DefiVault and invest them in Compound (more on this later)
 
 ### 2. Setup the project locally
+#### Contracts deployment
 <ul>
   <li>Clone locally this repository and open a terminal in the top level directory</li>
   <li>Install truffle and ganache-cli</li>
@@ -51,6 +53,10 @@ There are two ways to use DefiVault, both of them require metamask browser plugi
 
       npm install
       npm run deploy
+  </ul>
+
+####  Contracts deployment
+<ul>
    <li>Create .env file in ui-app and add the required fields</li>
 
     cd ../ui-app
@@ -62,7 +68,7 @@ There are two ways to use DefiVault, both of them require metamask browser plugi
 
     yarn dev
 </ul>
-
+Disclaimer: The Compound.finance functionality needs the setup of the Compound contracts locally and is not covered. Please use the deployed Ropsten contracts.
 
 ## Smart contract unit tests
 
@@ -73,37 +79,23 @@ or
 
     npm run test
 
+## Corners cut
+
+* UI is not optimized or smaller screens
+* Gas optimization
+
+
+## Walkthrough
+To test the compound.finance integration in Ropsten with COMP token:
+* Get ether from <a href='https://faucet.ropsten.be/'>ropsten faucet</a>
+* Exchange some ether for COMP in uniswap, add the <a href='https://ropsten.etherscan.io/token/0xf76d4a441e4ba86a923ce32b89aff89dbccaa075'>correct COMP address</a> in <a href='https://app.uniswap.org/#/swap'>uniswap</a>
+* Use <a href='https://ropsten.etherscan.io/token/0xf76d4a441e4ba86a923ce32b89aff89dbccaa075#writeContract'>COMP etherscan contract panel</a> to approve COMP to the DefiVault contract
+* Deposit comp to defivault using the 2nd tab (the defivault contract address can be found in PTRD tab or in deployed_addresses.txt)
+* After deposit is complete get the <a href='https://ropsten.etherscan.io/token/0x70014768996439f71c041179ffddce973a83eef2'>cCOMP contract address</a> from <a href='https://compound.finance/docs#networks'>compound website (ropsten)</a> and supply COMP from `Invest with Compound` tab
+* Upon success you should see the minted cCOMP tokens in your wallet
+* Use the redeem section to send back the cCOMP and get COMP + interest - fees in your DefiVault wallet
 
 ## Ethereum account (for NFT certification)
 ```
-TODO: add address
+0x0484bd57f856eA52bBd00188947E37c9809276B6
 ```
-
-### Contract links on ropsten
-
-Compound (COMP)
-0xf76D4a441E4ba86A923ce32B89AFF89dBccAA075
-https://ropsten.etherscan.io/token/0xf76D4a441E4ba86A923ce32B89AFF89dBccAA075#readContract
-
-Compound COMP (cCOMP)
-0x70014768996439f71c041179ffddce973a83eef2
-https://ropsten.etherscan.io/token/0x70014768996439f71c041179ffddce973a83eef2
-
-To get COMP:
-  * get ropsten ETH from (faucet link)
-  * go to https://app.uniswap.org/#/swap add COMP(0xf76D4a441E4ba86A923ce32B89AFF89dBccAA075) as exchange token
-  * exchange ETH with the imported COMP
-
-Tether USD (USDT)
-0x110a13fc3efe6a245b50102d2d79b3e76125ae83
-https://ropsten.etherscan.io/token/0x110a13fc3efe6a245b50102d2d79b3e76125ae83#readContract
-
-Compound USDT (cUSDT)
-0xf6958cf3127e62d3eb26c79f4f45d3f3b2ccded4
-https://ropsten.etherscan.io/token/0xf6958cf3127e62d3eb26c79f4f45d3f3b2ccded4
-
-
-The most likely reason for this error is that you are using "string" data type for URIs, and so the compiler naturally cannot estimate the gas usage when calling the mint function as the uri parameter's length can be arbitrary. Solidity documentation recommends the following:
-
-As a general rule, use bytes for arbitrary-length raw byte data and string for arbitrary-length string (UTF-8) data. If you can limit the length to a certain number of bytes, always use one of the value types bytes1 to bytes32 because they are much cheaper.
-
