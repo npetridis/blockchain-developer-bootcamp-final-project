@@ -1,22 +1,7 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider')
-
-const PRIVATE_KEYS = {
-  ropsten: '5a21febe1c40389510aed9e3b627b34b5dd0ac603bbc56bfce437d23a5b76806',
-  rinkeby: ''
-}
-
-const INFURA_URLS = {
-  ropsten: 'https://ropsten.infura.io/v3/15c2e8fee7c04556986494cb86fc4d2d',
-  rinkeby: 'https://rinkeby.infura.io/v3/15c2e8fee7c04556986494cb86fc4d2d'
-}
+require('dotenv').config();
 
 module.exports = {
-  // Uncommenting the defaults below 
-  // provides for an easier quick-start with Ganache.
-  // You can also follow this format for other networks;
-  // see <http://truffleframework.com/docs/advanced/configuration>
-  // for more details on how to specify configuration options!
-  //
   compilers: {
     solc: {
       version: '0.8.9'
@@ -36,26 +21,26 @@ module.exports = {
     ropsten: {
       provider: function() {
         return new HDWalletProvider({
-          privateKeys: [PRIVATE_KEYS.ropsten],
-          providerOrUrl: INFURA_URLS.ropsten,
+          privateKeys: process.env.DEPLOYER_PRIVATE_KEY,
+          providerOrUrl: process.env.ROPSTEN_RPC_URL,
           numberOfAddresses: 1
         })
       },
       network_id: 3,
-      gas: 4000000      //make sure this gas allocation isn't over 4M, which is the max
+      gas: 4000000
     },
-    rinkeby: {
-      provider: function() { 
-       return new HDWalletProvider({
-        privateKeys: [PRIVATE_KEYS.rinkeby],
-        providerOrUrl: INFURA_URLS.rinkeby,
-        numberOfAddresses: 1
-       })
-      },
-      network_id: 4,
-      gas: 4000000, //4500000,
+    // rinkeby: {
+    //   provider: function() { 
+    //    return new HDWalletProvider({
+    //     privateKeys: [PRIVATE_KEYS.rinkeby],
+    //     providerOrUrl: INFURA_URLS.rinkeby,
+    //     numberOfAddresses: 1
+    //    })
+    //   },
+    //   network_id: 4,
+    //   gas: 4000000, //4500000,
       // gasPrice: 10000000000,
-    }
+    // }
   },
   //
   // Truffle DB is currently disabled by default; to enable it, change enabled:

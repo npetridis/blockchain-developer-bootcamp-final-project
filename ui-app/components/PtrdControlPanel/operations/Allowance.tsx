@@ -3,7 +3,7 @@ import { Box, FormLabel, Input, Stack } from '@chakra-ui/react';
 import { Button } from 'components/common';
 import { Item } from './Item';
 import { useForm } from 'react-hook-form';
-import { BigNumber, utils } from 'ethers';
+import { ethers } from 'ethers';
 
 type AllowanceProps = {
   onClick: (data: AllowanceFormProps) => Promise<string>;
@@ -19,7 +19,7 @@ export function Allowance({ onClick }: AllowanceProps) {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, errors, isDirty },
+    formState: { errors },
   } = useForm<AllowanceFormProps>({
     mode: 'onChange',
   });
@@ -38,7 +38,11 @@ export function Allowance({ onClick }: AllowanceProps) {
             id="ownerAddress"
             type="text"
             placeholder="0x0000...0000"
-            {...register('ownerAddress', { required: true })}
+            {...register('ownerAddress', { 
+              required: true,
+              validate: (value) =>
+                ethers.utils.isAddress(value) 
+              })}
           />
         </Box>
         <Box>
@@ -47,7 +51,11 @@ export function Allowance({ onClick }: AllowanceProps) {
             id="spenderAddress"
             type="text"
             placeholder="0x0000...0000"
-            {...register('spenderAddress', { required: true })}
+            {...register('spenderAddress', { 
+              required: true,
+              validate: (value) =>
+                ethers.utils.isAddress(value) 
+            })}
           />
         </Box>
         <Button

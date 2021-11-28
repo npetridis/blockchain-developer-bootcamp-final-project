@@ -3,7 +3,7 @@ import { Box, FormLabel, Input, Stack } from '@chakra-ui/react';
 import { Button } from 'components/common';
 import { Item } from './Item';
 import { useForm } from 'react-hook-form';
-import { BigNumber, utils } from 'ethers';
+import { BigNumber, ethers, utils } from 'ethers';
 import { useWallet } from 'hooks/useWallet';
 
 type ApproveProps = {
@@ -34,11 +34,15 @@ export function Approve({ onClick }: ApproveProps) {
             id="address"
             type="text"
             placeholder="0x0000...0000"
-            {...register('address', { required: true })}
+            {...register('address', { 
+              required: true,
+              validate: (value) =>
+                ethers.utils.isAddress(value) 
+            })}
           />
         </Box>
         <Box>
-          <FormLabel htmlFor="amount">Type token amount to approve:</FormLabel>
+          <FormLabel htmlFor="amount">Type token amount to approve (base units):</FormLabel>
           <Input
             id="amount"
             type="number"

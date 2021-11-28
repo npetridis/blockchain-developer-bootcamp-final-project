@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useWallet } from 'hooks';
 import { Card, Button as ButtonShared } from 'components/common';
 import { Button, Input, Stack, Box, FormLabel } from '@chakra-ui/react';
+import { ethers } from 'ethers';
 
 type DepositTokenSectionProps = {
   onDepositToken: (obj: any) => Promise<any>;
@@ -44,22 +45,20 @@ export function DepositTokenSection({
             placeholder="0x0000...0000"
             {...register('contractAddress', {
               required: true,
-              // validate: (value) =>
-              //   utils.parseEther(value).gt(BigNumber.from(0)),
+              validate: (value) =>
+                ethers.utils.isAddress(value),
             })}
             disabled={!isConnected}
           />
         </Box>
         <Box>
-          <FormLabel htmlFor="amount">Deposit amount:</FormLabel>
+          <FormLabel htmlFor="amount">Deposit amount (base units):</FormLabel>
           <Input
             type="number"
             id="amount"
             placeholder="0.0"
             {...register('amount', {
               required: true,
-              // validate: (value) =>
-              //   utils.parseEther(value).gt(BigNumber.from(0)),
             })}
             disabled={!isConnected}
             step="any"

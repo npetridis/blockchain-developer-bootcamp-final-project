@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useWallet } from 'hooks';
 import { Card, Button as ButtonShared } from 'components/common';
 import { Button, Input, Stack, Box, FormLabel } from '@chakra-ui/react';
+import { ethers } from 'ethers';
 
 type SupplyTokenToCompoundSectionProps = {
   onSupplyTokenToCompound: (obj: SupplyTokenToCompoundFormProps) => Promise<any>;
@@ -47,8 +48,8 @@ export function SupplyTokenToCompoundSection({
             placeholder="0x0000...0000"
             {...register('tokenAddress', {
               required: true,
-              // validate: (value) =>
-              //   utils.parseEther(value).gt(BigNumber.from(0)),
+              validate: (value) =>
+                ethers.utils.isAddress(value),
             })}
             disabled={!isConnected}
           />
@@ -68,15 +69,13 @@ export function SupplyTokenToCompoundSection({
           />
         </Box>
         <Box>
-          <FormLabel htmlFor="amount">ERC20 token amount to supply:</FormLabel>
+          <FormLabel htmlFor="amount">ERC20 token amount to supply (base units):</FormLabel>
           <Input
             type="number"
             id="amount"
             placeholder="0.0"
             {...register('amount', {
               required: true,
-              // validate: (value) =>
-              //   utils.parseEther(value).gt(BigNumber.from(0)),
             })}
             disabled={!isConnected}
             step="any"

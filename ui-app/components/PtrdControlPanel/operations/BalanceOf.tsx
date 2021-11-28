@@ -3,6 +3,7 @@ import { Box, FormLabel, Input, Stack } from '@chakra-ui/react';
 import { Button } from 'components/common';
 import { Item } from './Item';
 import { useForm } from 'react-hook-form';
+import { ethers } from 'ethers';
 
 type BalanceOfProps = {
   onClick: (data: BalanceOfFormProps) => Promise<string>;
@@ -17,7 +18,7 @@ export function BalanceOf({ onClick }: BalanceOfProps) {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, errors, isDirty },
+    formState: { errors },
   } = useForm<BalanceOfFormProps>({
     mode: 'onChange',
   });
@@ -36,7 +37,11 @@ export function BalanceOf({ onClick }: BalanceOfProps) {
             id="address"
             type="text"
             placeholder="0x0000...0000"
-            {...register('address', { required: true })}
+            {...register('address', { 
+              required: true,
+              validate: (value) =>
+                ethers.utils.isAddress(value) 
+            })}
           />
         </Box>
         <Button w="full" type="submit" isDisabled={!!errors.address}>

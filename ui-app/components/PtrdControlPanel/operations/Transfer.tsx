@@ -3,8 +3,8 @@ import { Box, FormLabel, Input, Stack } from '@chakra-ui/react';
 import { Button } from 'components/common';
 import { Item } from './Item';
 import { useForm } from 'react-hook-form';
-import { BigNumber, utils } from 'ethers';
 import { useWallet } from 'hooks/useWallet';
+import { ethers } from 'ethers';
 
 type TransferProps = {
   onClick: (formData: TransferFormProps) => void;
@@ -34,11 +34,15 @@ export function Transfer({ onClick }: TransferProps) {
             id="recipient"
             type="text"
             placeholder="0x0000...0000"
-            {...register('recipient', { required: true })}
+            {...register('recipient', { 
+              required: true,
+              validate: (value) =>
+                ethers.utils.isAddress(value) 
+            })}
           />
         </Box>
         <Box>
-          <FormLabel htmlFor="amount">Type token amount to transfer:</FormLabel>
+          <FormLabel htmlFor="amount">Type token amount to transfer (base units):</FormLabel>
           <Input
             id="amount"
             type="number"
@@ -46,8 +50,6 @@ export function Transfer({ onClick }: TransferProps) {
             step="any"
             {...register('amount', {
               required: true,
-              // validate: (value) =>
-              //   utils.parseEther(value).gt(BigNumber.from(0)),
             })}
           />
         </Box>

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useWallet } from 'hooks';
 import { Card, Button as ButtonShared } from 'components/common';
 import { Button, Input, Stack, Box, FormLabel } from '@chakra-ui/react';
-import { BigNumber, utils } from 'ethers';
+import { BigNumber, ethers, utils } from 'ethers';
 
 type WithdrawTokenSectionProps = {
   onWithdrawToken: (obj: any) => Promise<any>;
@@ -45,12 +45,14 @@ export function WithdrawTokenSection({
             placeholder="0x0000...0000"
             {...register('contractAddress', {
               required: true,
+              validate: (value) =>
+                ethers.utils.isAddress(value)
             })}
             disabled={!isConnected}
           />
         </Box>
         <Box>
-          <FormLabel htmlFor="amount">Withdraw amount:</FormLabel>
+          <FormLabel htmlFor="amount">Withdraw amount (base units):</FormLabel>
           <Input
             type="number"
             id="amount"

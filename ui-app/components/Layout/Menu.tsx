@@ -37,9 +37,6 @@ export function Menu() {
   return (
     <HStack
       justifySelf="center"
-      // borderRadius="2xl"
-      // bg="background.dark"
-      // p="6px"
       zIndex="2"
       bg="background.light"
       borderRadius="3xl"

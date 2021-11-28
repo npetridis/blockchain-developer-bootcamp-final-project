@@ -37,14 +37,8 @@ export const theme = extendTheme({
     },
     Accordion: {
       baseStyle: {
-        // panel: {
-        //   width: '500px'
-        // },
         container: {
           color: 'text.regular',
-          // rounded: "2xl",
-          // bg: 'background.active'
-
         }
       }
     }

@@ -2,7 +2,7 @@
 
 The DefiVault smart contracts apply the following security measures against the mentioned attack vectors.
 
-## Reenetrancy - <a href='https://swcregistry.io/docs/SWC-107'>[SWC-107]</a>
+## Reentrancy - <a href='https://swcregistry.io/docs/SWC-107'>[SWC-107]</a>
 
 * Use Open Zeppelin's ReentrancyGuard to safeguard against reentrancy attack.
 * Use Checks-Effects-Interactions in the `withdrawEther`, `withdrawToken` and `redeemCErc20Tokens` functions.

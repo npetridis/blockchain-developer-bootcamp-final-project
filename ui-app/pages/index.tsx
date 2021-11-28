@@ -12,6 +12,7 @@ const Home: NextPage = () => {
   return <div>Loading..</div>;
 };
 
+// Redirect '/' to '/ether'
 Home.getInitialProps = async ({ res }: NextPageContext) => {
   if (res) {
     res.writeHead(301, { Location: '/ether' });

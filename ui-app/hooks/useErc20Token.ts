@@ -96,7 +96,6 @@ export const useErc20Token = (
       if (!contract) return null;
       const result = await contract.balanceOf(accountAddress);
 
-      console.log('result', typeof result, result);
       return result;
     }, [provider, contractAddress]);
 
@@ -115,7 +114,6 @@ export const useErc20Token = (
       if (!contract) return null;
       const result = await contract.allowance(ownerAddress, spenderAddress);
 
-      console.log('result', typeof result, result);
       return result;
     }, [provider, contractAddress]
   );

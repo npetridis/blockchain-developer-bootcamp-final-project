@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, Button, Box, HStack, Tag, Grid, Icon } from '@chakra-ui/react';
+import { Flex, Button, Box, Grid, Icon } from '@chakra-ui/react';
 import { useWallet } from 'hooks';
 import { Menu } from './Menu';
 import { WalletInfo } from './WalletInfo';
@@ -30,7 +30,6 @@ export function Layout({ children }: Props) {
           w="100%"
           p="4"
           mb="8"
-          // zIndex="2"
         >
           <Icon w='141px' h='40px' as={DefiVault} />
           <Menu />

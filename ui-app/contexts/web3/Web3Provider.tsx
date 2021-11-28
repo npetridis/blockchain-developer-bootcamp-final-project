@@ -7,14 +7,10 @@ export const Web3Provider: React.FC = ({ children }) => {
   const [provider, setProvider] = React.useState<Web3ContextType>(null);
 
   React.useEffect(() => {
-    console.log('AAA', window.ethereum.isConnected());
-
+    if (!window.ethereum) {
+      return;
+    }
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-    // gia metamask
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // gia allon client px locally h infura
-    // const provider = new ethers.providers.JsonRpcProvider();
 
     setProvider(provider);
   }, []);
