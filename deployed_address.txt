@@ -1,0 +1,7 @@
+// This file contains the testnet address and network where contacts have been deployed
+
+DefiVault contract has been deployed on Ropsten testnet.
+Address: 0x942F7D5251F1Ffd1Ba98fe0dc375e63ddbdAEE41
+
+Petrideum ERC20 token has been deployed on Ropsten testnet.
+Address: 0xD9444097a7414CbF2Edc4AAe445b8EEeceD339a8

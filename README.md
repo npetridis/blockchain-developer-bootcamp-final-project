@@ -1,12 +1,11 @@
 # DefiVault - Defi wallet and funds investor 
 
+<p>A smart contract wallet that stores ether and any Erc20 token and can invest in Compound.finance protocol any supported Erc20 token.</p>
 
-<img src="./ui-app/public/defivault.svg" alt="drawing"  />
-
-<p>A smart contract wallet that stores ether and any Erc20 token and can invest in Compound.finance protocol any supported Erc20 token</p>
-
-The contract is deployed and verified(??) on the Ropsten testnet at  
-`TODO add address`
+The contract is deployed in testnet at address  
+```
+0x942F7D5251F1Ffd1Ba98fe0dc375e63ddbdAEE41
+```
 
 ### Smart contracts
 The Smart contracts implement functionality to 
@@ -20,7 +19,8 @@ The Smart contracts implement functionality to
 * redeem ERC20 tokens supplied to Compound.finance along with interest (for short term supply period we could notice that we redeemed less than we supplied due to the fees)
 
 ### UI client
-A Next.js app that uses ethers.js wrapped in custom hooks to interact with the blockchain  
+A Next.js app that uses ethers.js wrapped in custom hooks to interact with the blockchain.  
+It is deployed with vercel in <a href='https://defivault.vercel.app/'>defivault.vercel.app</a>.  
 The app integrates with all the smart contract functionalities through the three following sections that correspond to the UI tabs:
 * Ether: exposes functionality to interact with ether (deposit, withdraw)
 * ERC20: exposes functionality to interact with ERC20 tokens (deposit,  withdraw, supply to Compound, redeem from compound)
@@ -55,7 +55,7 @@ There are two ways to use DefiVault, both of them require metamask browser plugi
       npm run deploy
   </ul>
 
-####  Contracts deployment
+####  Front-end deployment
 <ul>
    <li>Create .env file in ui-app and add the required fields</li>
 
