@@ -143,6 +143,11 @@ contract DefiVault is ReentrancyGuard, EtherWallet {
     return tokenBalances[msg.sender].balances[tokenAddress];
   }
 
+  /// @notice Supply compatible ERC20 token to Compound.finance
+  /// @param _erc20Contract address of the underlying ERC20 token contract
+  /// @param _cErc20Contract address of the cToken ERC20 contract
+  /// @param _numTokensToSupply amount of ERC20 tokens to supply to Compound.finance
+  /// @return 0 when success
   function supplyErc20ToCompound(
     address _erc20Contract,
     address _cErc20Contract,
@@ -182,6 +187,10 @@ contract DefiVault is ReentrancyGuard, EtherWallet {
     return mintResult;
   }
 
+  /// @notice Redeem cToken to underlying ERC20 token from Compound.finance
+  /// @param _cTokenAmount amount of cTokens to redeem from Compound.finance
+  /// @param _cErc20Contract address of the cToken ERC20 contract
+  /// @return amount of ERC20 tokens that was redeemed back from Compound.finance
   function redeemCErc20Tokens(
     uint256 _cTokenAmount,
     address _cErc20Contract
