@@ -7,6 +7,8 @@ The contract is deployed in testnet at address
 0x942F7D5251F1Ffd1Ba98fe0dc375e63ddbdAEE41
 ```
 
+Front-end link: `https://defivault.vercel.app`
+
 ### Smart contracts
 The Smart contracts implement functionality to 
 * deposit ether in the DefiVault smart contract
@@ -39,6 +41,17 @@ There are two ways to use DefiVault, both of them require metamask browser plugi
 * Exchange ether with other Compound protocol compatible tokens in uniswap in order to deposit them in DefiVault and invest them in Compound (more on this later)
 
 ### 2. Setup the project locally
+
+#### Prerequisites
+
+<ul>
+<li>npm >= 6</li>
+<li>Node.js >= 14</li>
+<li>Ganache CLI >= 6 </li>
+<li>Truffle >= 5 </li>
+<li>Solidity - 0.8.9 (solc-js) </li>
+</ul>
+
 #### Contracts deployment
 <ul>
   <li>Clone locally this repository and open a terminal in the top level directory</li>
@@ -72,17 +85,12 @@ Disclaimer: The Compound.finance functionality needs the setup of the Compound c
 
 ## Smart contract unit tests
 
-To run the unit tests start `ganache-cli` in a terminal and then in a new window run:
+To run the unit tests start `ganache-cli` (default port 8545) in a terminal and then in a new window run:
 
     truffle test
 or
 
     npm run test
-
-## Corners cut
-
-* UI is not optimized or smaller screens
-* Gas optimization
 
 
 ## Walkthrough
@@ -96,6 +104,17 @@ To test the compound.finance integration in Ropsten with COMP token:
 * Use the redeem section to send back the cCOMP and get COMP + interest - fees in your DefiVault wallet
 
 Video walkthrough: https://youtu.be/FZUNgM4LhFA
+
+## Project structure
+The project is a monorepo which consists of two basic top-level directories:  
+* `smart-contracts`: A solidity project built with truffle that has that implements the DefiVault smart contracts, compiles and deploys them in ganache-cli and Rostep testnet and also copies the generated abi to the ui-app directory  
+* `ui-app`: A Next.js application written in typescript that uses Metamask and. ethers to interact with DefiVault smart contracts whether they are in Ropsten or deployed locally.
+
+
+## Corners cut
+
+* UI is not optimized for smaller screens
+* Gas optimization
 
 ## Ethereum account (for NFT certification)
 ```
