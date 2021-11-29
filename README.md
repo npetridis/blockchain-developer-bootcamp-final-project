@@ -95,6 +95,8 @@ To test the compound.finance integration in Ropsten with COMP token:
 * Upon success you should see the minted cCOMP tokens in your wallet
 * Use the redeem section to send back the cCOMP and get COMP + interest - fees in your DefiVault wallet
 
+Video walkthrough: https://youtu.be/FZUNgM4LhFA
+
 ## Ethereum account (for NFT certification)
 ```
 0x0484bd57f856eA52bBd00188947E37c9809276B6
